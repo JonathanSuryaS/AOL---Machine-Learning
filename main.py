@@ -4,6 +4,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from pandas_profiling import ProfileReport
+from streamlit_pandas_prodiling import st_profile_report
 
 # Data
 data = pd.read_csv('trainPlane.csv')
@@ -40,9 +41,8 @@ if st.sidebar.button("Exploratory Data Analysis"):
   st.markdown("""
     <h4 style='text-align: left; color: white; font-family: Arial;'>Overview</h4>
     """, unsafe_allow_html=True)
-  pr_html = pr.to_html()
   pr = ProfileReport(data, explorative = True)
-  st.components.v1.html(pr_html, height=1000, scrolling=True)
+  st_profile_report(pr)
 
   # Data distribution
   fig, ax = plt.subplots(1, 2, figsize=(18, 8))
