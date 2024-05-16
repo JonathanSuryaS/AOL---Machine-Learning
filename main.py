@@ -1,9 +1,17 @@
 # Libraries
 import streamlit as st
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Data
+data = pd.read_csv('trainPlane.csv')
 
 
 # Main Section
-st.title('Airline Satisfaction Prediction')
+st.markdown("""
+    <h1 style='text-align: center; color: white; font-family: Arial;'>Airline Satisfaction Prediction</h1>
+    """, unsafe_allow_html=True)
 # Short Description for Apps
 
 
@@ -17,10 +25,9 @@ if st.sidebar.button('Homepage'):
 
 if st.sidebar.button("Exploratory Data Analysis"):
   # Display dashboard content
-  st.markdown('''
-  # **Exploratory Data Analysis**   
-
-    ''')
+  st.markdown("""
+    <h2 style='text-align: left; color: white; font-family: Arial;'>Exploratory Data Analysis</h2>
+    """, unsafe_allow_html=True)
 
 
 
@@ -45,4 +52,4 @@ def set_background(color):
     st.markdown(html, unsafe_allow_html=True)
 
 # Set the background color
-set_background("f9bfbf")
+set_background("7091E6")
