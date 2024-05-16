@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from pandas_profiling import ProfileReport
 
 # Data
 data = pd.read_csv('trainPlane.csv')
@@ -22,12 +23,35 @@ st.sidebar.header("Program Menu")
 if st.sidebar.button('Homepage'):
    st.title('Homepage')
 
-
+### Exploratory Data analysis
 if st.sidebar.button("Exploratory Data Analysis"):
   # Display dashboard content
   st.markdown("""
-    <h2 style='text-align: left; color: white; font-family: Arial;'>Exploratory Data Analysis</h2>
+    <br><h2 style='text-align: left; color: white; font-family: Arial;'>Exploratory Data Analysis (EDA)</h2>
     """, unsafe_allow_html=True)
+  
+  # Data
+  st.markdown("""
+    <h3 style='text-align: left; color: white; font-family: Arial;'>Dataset</h3>
+    """, unsafe_allow_html=True)
+  data
+
+  # Overciew
+  st.markdown("""
+    <h4 style='text-align: left; color: white; font-family: Arial;'>Overview</h4>
+    """, unsafe_allow_html=True)
+  pr_html = pr.to_html()
+  pr = ProfileReport(data, explorative = True)
+  st.components.v1.html(pr_html, height=1000, scrolling=True)
+
+  # Data distribution
+  fig, ax = plt.subplots(1, 2, figsize=(18, 8))
+  data['satisfaction'].value_counts().plot(kind = 'pie', ax = ax[0], autopct = '%1.1f%%', explode = [0, 0.1])
+  ax[0].set_ylabel('')
+  ax[0].set_title('Satisfaction Distribution (Pie chart)')
+  ax[0].set_title('Satisfaction Distribution (Count plot)')
+  sns.countplot(data = data, x = 'satisfaction', hue = 'satisfaction')
+  st.pyplot(fig)
 
 
 
