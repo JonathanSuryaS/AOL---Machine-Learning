@@ -6,9 +6,11 @@ import matplotlib.pyplot as plt
 from ydata_profiling import ProfileReport
 from streamlit_pandas_profiling import st_profile_report
 import pandas_profiling as pp
+import pickle
 
 
 def EDA(data):
+    set_background("508CA4")
     # Display dashboard content
     st.markdown("""
       <br><h1 style='text-align: left; color: white; font-family: Arial;'>Exploratory Data Analysis (EDA)</h1>
@@ -378,7 +380,7 @@ def EDA(data):
     
     # Baggage Handling
     st.markdown("""<br>
-      <h3 style='text-align: left; color: white; font-family: Arial;'>Seat Comfort</h3>
+      <h3 style='text-align: left; color: white; font-family: Arial;'>Baggage Handling</h3>
       """, unsafe_allow_html=True)
     fig, ax = plt.subplots(1, 2, figsize=(18, 8))
     data['Baggage handling'].value_counts().plot(kind = 'pie', ax = ax[0], autopct = '%1.1f%%')
@@ -388,12 +390,13 @@ def EDA(data):
     sns.pointplot(data = data, x = 'Baggage handling', y = 'satisfaction')
     st.pyplot(fig)
     st.markdown("""
-      <p style='text-align: justify; color: white; font-family: Arial;'>Starting from category 3, the higher Online Boarding Category, the higher average of customer satisfaction</p>
+      <p style='text-align: justify; color: white; font-family: Arial;'>Baggage handling shows the higher the category, the higher average of customer satisfaction. But it can be seen 
+      that the average of satisfaction slightly decrease for category 3./p>
     """, unsafe_allow_html=True)
     
     # Inflight Service
     st.markdown("""<br>
-      <h3 style='text-align: left; color: white; font-family: Arial;'>Seat Comfort</h3>
+      <h3 style='text-align: left; color: white; font-family: Arial;'>Inflight Service</h3>
       """, unsafe_allow_html=True)
     fig, ax = plt.subplots(1, 2, figsize=(18, 8))
     data['Inflight service'].value_counts().plot(kind = 'pie', ax = ax[0], autopct = '%1.1f%%')
@@ -403,9 +406,109 @@ def EDA(data):
     sns.pointplot(data = data, x = 'Inflight service', y = 'satisfaction')
     st.pyplot(fig)
     st.markdown("""
-      <p style='text-align: justify; color: white; font-family: Arial;'>Starting from category 3, the higher Online Boarding Category, the higher average of customer satisfaction</p>
+      <p style='text-align: justify; color: white; font-family: Arial;'>Inflight Service shows also shows the higher the category, the higher average satisfaction of customer. However, it can be seen
+      that the average of satisfaction slightly decrease for category 3.</p>
+    """, unsafe_allow_html=True)
+    
+    # Cleanliness
+    st.markdown("""<br>
+      <h3 style='text-align: left; color: white; font-family: Arial;'>Cleanliness</h3>
+      """, unsafe_allow_html=True)
+    fig, ax = plt.subplots(1, 2, figsize=(18, 8))
+    data['Cleanliness'].value_counts().plot(kind = 'pie', ax = ax[0], autopct = '%1.1f%%')
+    ax[0].set_ylabel('')
+    ax[0].set_title('Cleanliness Distribution (Pie chart)')
+    ax[1].set_title('Point plot Cleanliness vs Satisfaction')
+    sns.pointplot(data = data, x = 'Cleanliness', y = 'satisfaction')
+    st.pyplot(fig)
+    st.markdown("""
+      <p style='text-align: justify; color: white; font-family: Arial;'>For Cleanliness, it shows that as the higher category, so is the average of customer satisfaction.</p>
+    """, unsafe_allow_html=True)
+    
+    # Departure  & Arrival Delay in Minutes
+    st.markdown("""<br>
+      <h3 style='text-align: left; color: white; font-family: Arial;'>Departure  & Arrival Delay in Minutes</h3>
+      """, unsafe_allow_html=True)
+    fig, ax = plt.subplots(1, 2, figsize=(18, 8))
+    sns.histplot(data = data, x = 'Departure Delay in Minutes', ax = ax[0], bins = 30, kde = True)
+    ax[0].set_ylabel('')
+    ax[1].set_title('Departure Delay in Minutes Distribution (Boxplot)')
+    ax[0].set_title('Departure Delay in Minutes Distribution (Histogram)')
+    sns.boxplot(data = data, x = 'Departure Delay in Minutes')
+    st.pyplot(fig)
+    st.markdown("""
+      <p style='text-align: justify; color: white; font-family: Arial;'>For Cleanliness, it shows that as the higher category, so is the average of customer satisfaction.</p>
+    """, unsafe_allow_html=True)
+    
+    fig, ax = plt.subplots(1, 2, figsize=(18, 8))
+    sns.histplot(data = data, x = 'Departure Delay in Minutes', ax = ax[0], bins = 30, kde = True)
+    ax[0].set_ylabel('')
+    ax[1].set_title('Departure Delay in Minutes Distribution (Boxplot)')
+    ax[0].set_title('Departure Delay in Minutes Distribution (Histogram)')
+    sns.boxplot(data = data, x = 'Departure Delay in Minutes')
+    st.pyplot(fig)
+    st.markdown("""
+      <p style='text-align: justify; color: white; font-family: Arial;'>For Cleanliness, it shows that as the higher category, so is the average of customer satisfaction.</p>
+    """, unsafe_allow_html=True)
+    
+    fig = plt.figure(figsize = (18, 8))
+    sns.scatterplot(data = data, x = 'Arrival Delay in Minutes', y = 'Departure Delay in Minutes')
+    plt.title('Arrival Delay in Minutes vs Departure Delay in Minutes')
+    plt.show()
+    st.pyplot(fig)
+    st.markdown("""
+      <p style='text-align: justify; color: white; font-family: Arial;'>Arrival Delay in Minutes and Departure Delay in Minutes, performs a linear pattern, where the higher Arrival Delay in Minutes
+      the higher Departure delay in Minutes.</p>
     """, unsafe_allow_html=True)
 
+    st.markdown("""
+      <br><h2 style='text-align: left; color: white; font-family: Arial;'>Relationship Between Variables</h2>
+      """, unsafe_allow_html=True)
+    numerical = data.select_dtypes(include='number')
+    fig = plt.figure(figsize=(18, 8))
+    plt.title('Correlation between features')
+    sns.heatmap(data = numerical.corr(), annot= True, linewidths=0.2)
+    st.pyplot(fig)
+    st.markdown("""
+      <p style='text-align: justify; color: white; font-family: Arial;'>The graph shows us that some feature has a high colinearity to each other, such as Departure Delay in Minutes
+      with Arrival Delay in Minutes, and many more.</p>
+    """, unsafe_allow_html=True)
+
+def prediction(data):
+  set_background('f1e0C5')
+  with open('random_forest.pkl', 'rb') as file:
+    model = pickle.load(file)
+  st.markdown("""
+    <br><h1 style='text-align: left; color: white; font-family: Arial;'>Does the customer satisfied with airline service?</h1>
+    """, unsafe_allow_html=True)
+  st.image('satisfied.jpg')
+  
+  #Insert Gender
+  st.markdown("""
+    <br><h4 style='text-align: left; color: white; font-family: Arial;'>Insert Gender</h4>
+    """, unsafe_allow_html=True)
+  Gender = ''
+  col1, col2 = st.columns([1, 1])
+  with col1:
+    if st.button('Male'):
+      Gender = 'Male'
+  with col2:
+    if st.button('Female'):
+      Gender = 'Female'
+      
+  #Insert CustomerType
+  st.radio(
+    label='Highest Rated Restaurants', 
+    options=("In-And-Out", "Tercera")
+  )
+
+  st.markdown(
+      """<style>
+  div[class*="stRadio"] > label > div[data-testid="stMarkdownContainer"] > p {
+      font-size: 32px;
+  }
+      </style>
+      """, unsafe_allow_html=True)
 
 def main():
     # Data
@@ -444,7 +547,7 @@ def set_background(color):
 
 
 # Set the background color
-set_background("508CA4")
+
 
 container_css = """
 <style>
@@ -459,4 +562,4 @@ container_css = """
 """
 
 data = pd.read_csv('trainPlane.csv')
-EDA(data)
+prediction(data)
