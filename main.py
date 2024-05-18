@@ -9,6 +9,29 @@ import matplotlib.pyplot as plt
 import pickle
 
 
+# Global Variables
+CustomerGender = ''
+CustomerType = ''
+age = ''
+TypeTravel = ''
+Class = ''
+Distance = ''
+inflight_wifi = ''
+departure_arrival_time = ''
+online_booking = ''
+gate_location = ''
+food_drink = ''
+online_boarding = ''
+seat_comfort = ''
+inflight_entertainment = ''
+onboard_service = ''
+legroom_service = ''
+baggage_handling = ''
+checkin_service = ''
+inflight_service = ''
+cleanliness = ''
+
+
 def EDA(data):
     def plot_distribution(data, column, title):
         fig, ax = plt.subplots(1, 2, figsize=(18, 8))
@@ -65,7 +88,7 @@ def EDA(data):
 
     # Relationship between variables
     st.markdown("""
-    <br><h2 style='text-align: left; color: white; font-family: Arial;'>Relationship Betwween Variables</h2>
+    <br><h2 style='text-align: left; color: white; font-family: Arial;'>Relationship Between Variables</h2>
     """, unsafe_allow_html=True)
 
     # Target Distribution
@@ -219,14 +242,14 @@ def EDA(data):
     """
     add_section('Gate Location', data, 'Gate location', GateTxt)
 
-  # Food and Drink
+    # Food and Drink
     FoodTxt = """
     Food and drinks also represent the same as majority, where as the category rise, so is the average of
     customer satisfaction, zero is also irrelevant since it only represented by 0.1%
     """
     add_section('Food and Drink', data, 'Food and drink', FoodTxt)
 
-# Online Boarding
+    # Online Boarding
     BoardingTxt = """
     Starting from category 3, the higher Online Boarding Category, the higher average of customer satisfaction, whive category below 3 
     does not show much difference of average satisfaction
@@ -245,7 +268,8 @@ def EDA(data):
     Inflight Entertainment shows that the higher the category of Inflight Entertainment, the higher the average
     of customer satisfaction
     """
-    add_section('Inflight Entertainment', data,'Inflight entertainment', EntTxt)
+    add_section('Inflight Entertainment', data,
+                'Inflight entertainment', EntTxt)
 
     # On - Board Service
     BoardTxt = """
@@ -295,7 +319,7 @@ def EDA(data):
     st.pyplot(fig)
     st.markdown("""
     <p style='text-align: justify; color: white; font-family: Arial;'>For Cleanliness, it shows that as the higher category, so is the average of customer satisfaction.</p>
-  """, unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
     fig, ax = plt.subplots(1, 2, figsize=(18, 8))
     sns.histplot(data=data, x='Departure Delay in Minutes',
@@ -307,7 +331,7 @@ def EDA(data):
     st.pyplot(fig)
     st.markdown("""
     <p style='text-align: justify; color: white; font-family: Arial;'>For Cleanliness, it shows that as the higher category, so is the average of customer satisfaction.</p>
-  """, unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
     fig = plt.figure(figsize=(18, 8))
     sns.scatterplot(data=data, x='Arrival Delay in Minutes',
@@ -318,7 +342,7 @@ def EDA(data):
     st.markdown("""
     <p style='text-align: justify; color: white; font-family: Arial;'>Arrival Delay in Minutes and Departure Delay in Minutes, performs a linear pattern, where the higher Arrival Delay in Minutes
     the higher Departure delay in Minutes.</p>
-  """, unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
     st.markdown("""
     <br><h2 style='text-align: left; color: white; font-family: Arial;'>Relationship Between Variables</h2>
     """, unsafe_allow_html=True)
@@ -330,10 +354,11 @@ def EDA(data):
     st.markdown("""
     <p style='text-align: justify; color: white; font-family: Arial;'>The graph shows us that some feature has a high colinearity to each other, such as Departure Delay in Minutes
     with Arrival Delay in Minutes, and many more.</p>
-  """, unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
 
 def prediction(data):
+    st.session_state.prediction_menu = not st.session_state.prediction_menu
     set_background('f1e0C5')
     with open('random_forest.pkl', 'rb') as file:
         model = pickle.load(file)
@@ -490,38 +515,59 @@ def prediction(data):
         if (result == 1):
             set_background('77DD77')
             st.markdown("""
-      <br><h3 style='text-align: center; color: white; font-family: Arial;'>Customer is Satisfied</h3>
-      """, unsafe_allow_html=True)
+                <br><h3 style='text-align: center; color: white; font-family: Arial;'>Customer is Satisfied</h3>
+                """, unsafe_allow_html=True)
         elif (result == 0):
             set_background('D2372F')
             st.markdown("""
-      <br><h3 style='text-align: center; color: white; font-family: Arial;'>Customer is not Satisfied</h3>
-      """, unsafe_allow_html=True)
+            <br><h3 style='text-align: center; color: white; font-family: Arial;'>Customer is not Satisfied</h3>
+            """, unsafe_allow_html=True)
         new_data = new_data.drop(new_data.index[-1])
 
 
 def main():
-    # Data
+    # Load your data
     data = pd.read_csv('trainPlane.csv')
+
     # Main Section
     st.markdown("""
       <h1 style='text-align: center; color: white; font-family: Arial;'>Airline Satisfaction Prediction</h1>
       """, unsafe_allow_html=True)
-    # Short Description for Apps
-    # Navigations
+
+    # Initialize session state for sidebar navigation
+    if 'active_section' not in st.session_state:
+        st.session_state.active_section = None
+
+    # Function to reset active section
+    def set_active_section(section):
+        st.session_state.active_section = section
+
+    # Sidebar Header
     st.sidebar.header("Program Menu")
-    # Homepage
+
+    # Homepage Button
     if st.sidebar.button('Homepage'):
-        st.title('Homepage')
+        set_active_section('Homepage')
 
-# Exploratory Data analysis
+    # Exploratory Data Analysis Button
     if st.sidebar.button("Exploratory Data Analysis"):
-        EDA(data)
+        set_active_section('EDA')
 
+    # Prediction Button
     if st.sidebar.button("Prediction"):
-        prediction(data)
+        set_active_section('Prediction')
 
-    # Functions
+    # Display content based on active_section state
+    if st.session_state.active_section == 'Homepage':
+        st.title('Homepage')
+    elif st.session_state.active_section == 'EDA':
+        EDA(data)
+    elif st.session_state.active_section == 'Prediction':
+        prediction(data)
+        if st.sidebar.button("Option 1"):
+            prediction_option1(data)
+        if st.sidebar.button("Option 2"):
+            prediction_option2(data)
 
 
 def set_background(color):
