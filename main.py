@@ -3,9 +3,9 @@ import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-#from ydata_profiling import ProfileReport
-#from streamlit_pandas_profiling import st_profile_report
-#simport pandas_profiling as pp
+# from ydata_profiling import ProfileReport
+# from streamlit_pandas_profiling import st_profile_report
+# simport pandas_profiling as pp
 import pickle
 
 
@@ -249,9 +249,9 @@ def EDA(data):
 
     # On - Board Service
     BoardTxt = """
-  On - Board Service shows athat the higher the category of On - Board Service, the higher the average
-    of customer satisfaction
-  """
+      On - Board Service shows athat the higher the category of On - Board Service, the higher the average
+      of customer satisfaction
+    """
     add_section('On - Board Service', data, 'On-board service', BoardTxt)
 
     # Leg Room Service
@@ -386,7 +386,8 @@ def prediction(data):
         'Insert Customer Type', ["Loyal", "Disloyal"])
 
     # Age
-    age = create_number_input("Enter your age:", min_value=0, max_value=100, value=25, step=1)
+    age = create_number_input(
+        "Enter your age:", min_value=0, max_value=100, value=25, step=1)
 
     # Insert Type of Travel
     TypeTravel = create_radio_input('Insert Type of Travel', [
@@ -395,13 +396,15 @@ def prediction(data):
     # Insert Class of Airlines
     Class = create_radio_input('Insert Travel Class', [
                                'Business', 'Eco Plus', 'Eco'])
-    
-    #Inser Flight Distance
-    Distance = create_number_input("Flight Distance", min_value=30, max_value=5000, value=30, step=1)
-    
-    #Airlines Service
+
+    # Inser Flight Distance
+    Distance = create_number_input(
+        "Flight Distance", min_value=30, max_value=5000, value=30, step=1)
+
+    # Airlines Service
     inflight_wifi = create_slider('Inflight wifi service', 0, 5)
-    departure_arrival_time = create_slider('Departure/Arrival time convenient', 0, 5)
+    departure_arrival_time = create_slider(
+        'Departure/Arrival time convenient', 0, 5)
     online_booking = create_slider('Ease of Online booking', 0, 5)
     gate_location = create_slider('Gate location', 0, 5)
     food_drink = create_slider('Food and drink', 0, 5)
@@ -414,13 +417,14 @@ def prediction(data):
     checkin_service = create_slider('Checkin service', 0, 5)
     inflight_service = create_slider('Inflight service', 0, 5)
     cleanliness = create_slider('Cleanliness', 0, 5)
-    
-    #Departure & Arrival Late
-    Departure = create_number_input("Departure Delay", min_value=0, max_value=1600, value=10, step=1)
-    Arrival = create_number_input("Arrival Delay", min_value=0, max_value=1600, value=10, step=1)
 
-    
-    #Inputted data
+    # Departure & Arrival Late
+    Departure = create_number_input(
+        "Departure Delay", min_value=0, max_value=1600, value=10, step=1)
+    Arrival = create_number_input(
+        "Arrival Delay", min_value=0, max_value=1600, value=10, step=1)
+
+    # Inputted data
     input_data = {
         'Gender': [CustomerGender],
         'Customer Type': [CustomerType],
@@ -446,48 +450,52 @@ def prediction(data):
         'Arrival Delay in Minutes': [Arrival]
     }
 
-    
     space()
     st.markdown("""
     <br><h3 style='text-align: left; color: white; font-family: Arial;'>Your Data</h3>
     """, unsafe_allow_html=True)
     input_data = pd.DataFrame(input_data)
     st.write(input_data)
-    
-    st.write('<style>div.Widget.row-widget.stButton>div{display:flex;justify-content:center;}</style>', unsafe_allow_html=True)
+
+    st.write(
+        '<style>div.Widget.row-widget.stButton>div{display:flex;justify-content:center;}</style>', unsafe_allow_html=True)
     # Create a centered button
     PredictButton = st.button("Predict Result")
 
     if PredictButton:
-      new_row = pd.DataFrame(input_data, index=[len(data)])
-      new_data = pd.concat([data, new_row], ignore_index=True)
+        new_row = pd.DataFrame(input_data, index=[len(data)])
+        new_data = pd.concat([data, new_row], ignore_index=True)
 
-      ##Modeling
-      ###Dropping undeeded columns
-      new_data = data.drop(columns=['Unnamed: 0', 'id', 'Cleanliness', 'Departure Delay in Minutes', 'Inflight wifi service', 'satisfaction'])
+        # Modeling
+        # Dropping undeeded columns
+        new_data = data.drop(columns=['Unnamed: 0', 'id', 'Cleanliness',
+                             'Departure Delay in Minutes', 'Inflight wifi service', 'satisfaction'])
 
-      ###Encoding
-      new_data = pd.get_dummies(new_data, drop_first=True)
+        # Encoding
+        new_data = pd.get_dummies(new_data, drop_first=True)
 
-      ###Processing
-      from sklearn.preprocessing import StandardScaler
-      sc = StandardScaler()
-      new_data.iloc[:, [0, 1, 14]] = sc.fit_transform(new_data.iloc[:, [0, 1, 14]])
+        # Processing
+        from sklearn.preprocessing import StandardScaler
+        sc = StandardScaler()
+        new_data.iloc[:, [0, 1, 14]] = sc.fit_transform(
+            new_data.iloc[:, [0, 1, 14]])
 
-      last_row = new_data.iloc[[-1]]
-      result = model.predict(last_row)
+        last_row = new_data.iloc[[-1]]
+        result = model.predict(last_row)
+        result
 
-      if(result == 1):
-        set_background('77DD77')
-        st.markdown("""
+        if (result == 1):
+            set_background('77DD77')
+            st.markdown("""
       <br><h3 style='text-align: center; color: white; font-family: Arial;'>Customer is Satisfied</h3>
       """, unsafe_allow_html=True)
-      elif (result == 0):
-        set_background('D2372F')
-        st.markdown("""
+        elif (result == 0):
+            set_background('D2372F')
+            st.markdown("""
       <br><h3 style='text-align: center; color: white; font-family: Arial;'>Customer is not Satisfied</h3>
       """, unsafe_allow_html=True)
-      
+        new_data = new_data.drop(new_data.index[-1])
+
 
 def main():
     # Data
@@ -544,5 +552,52 @@ container_css = """
 </style>
 """
 
+def testing(new_data):
+  new_data.loc[new_data['satisfaction']=='satisfied', 'satisfaction'] = 1
+  new_data.loc[new_data['satisfaction']=='neutral or dissatisfied', 'satisfaction'] = 0
+  new_data['satisfaction'] = new_data['satisfaction'].astype(int)
+  new_data.dropna(inplace= True)
+  (new_data.isnull().sum()).sum()
+  new_data.drop(columns=['id', 'Unnamed: 0'], inplace = True)
+  st.write(new_data.isnull().sum())
+
+  X = new_data.drop(columns=['satisfaction', 'Cleanliness', 'Departure Delay in Minutes', 'Inflight wifi service'])
+  y = new_data['satisfaction']
+
+  X = pd.get_dummies(X, drop_first=True)
+  X
+
+  from sklearn.model_selection import train_test_split
+  X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+
+  from sklearn.preprocessing import StandardScaler
+  sc = StandardScaler()
+  X_train.iloc[:, [0, 1, 14]] = sc.fit_transform(X_train.iloc[:, [0, 1, 14]])
+  X_test.iloc[:, [0, 1, 14]] = sc.transform(X_test.iloc[:, [0, 1, 14]])
+
+  from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix, ConfusionMatrixDisplay
+  from sklearn.model_selection import cross_val_score
+
+  def modeling(model, name):
+      y_pred = model.predict(X_test)
+      score = cross_val_score(model, X_train, y_train, cv=10)
+      print(f'{name} Evaluation')
+      print('Model Accuracy: ', accuracy_score(y_test, y_pred))
+      print('Model Precission: ', precision_score(y_test, y_pred))
+      print('Model Recall: ', recall_score(y_test, y_pred))
+      print('Cross Validation (10): ', score.mean())
+      cm = confusion_matrix(y_test, y_pred)
+      disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+      disp.plot()
+      st.write(cm)
+
+  with open('random_forest.pkl', 'rb') as file:
+        model = pickle.load(file)
+  from sklearn.ensemble import RandomForestClassifier
+  #forest = RandomForestClassifier(n_estimators=60)
+  modeling(model, 'Random Forest')
+  #feature_names = model.feature_names
+  #modeling(forest, 'randomForest')
+
 data = pd.read_csv('trainPlane.csv')
-prediction(data)
+testing(data)
