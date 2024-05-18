@@ -461,26 +461,27 @@ def prediction(data):
         '<style>div.Widget.row-widget.stButton>div{display:flex;justify-content:center;}</style>', unsafe_allow_html=True)
     # Create a centered button
     PredictButton = st.button("Predict Result")
-
     if PredictButton:
-        new_row = pd.DataFrame(input_data, index=[len(data)])
-        new_data = pd.concat([data, new_row], ignore_index=True)
+        new_data = data
+        new_data.loc[new_data['satisfaction']=='satisfied', 'satisfaction'] = 1
+        new_data.loc[new_data['satisfaction']=='neutral or dissatisfied', 'satisfaction'] = 0
+        new_data['satisfaction'] = new_data['satisfaction'].astype(int)
+        new_data.dropna(inplace= True)
+        new_data.drop(columns=['id', 'Unnamed: 0'], inplace = True)
+      
+        X = new_data.drop(columns=['satisfaction', 'Cleanliness', 'Departure Delay in Minutes', 'Inflight wifi service'])
+        input_data.drop(columns=['Cleanliness', 'Departure Delay in Minutes', 'Inflight wifi service'], inplace=True)
 
-        # Modeling
-        # Dropping undeeded columns
-        new_data = data.drop(columns=['Unnamed: 0', 'id', 'Cleanliness',
-                             'Departure Delay in Minutes', 'Inflight wifi service', 'satisfaction'])
+      
+        X = pd.concat([X, input_data], ignore_index=True)
+        X
+        X = pd.get_dummies(X, drop_first=True)
 
-        # Encoding
-        new_data = pd.get_dummies(new_data, drop_first=True)
 
-        # Processing
         from sklearn.preprocessing import StandardScaler
         sc = StandardScaler()
-        new_data.iloc[:, [0, 1, 14]] = sc.fit_transform(
-            new_data.iloc[:, [0, 1, 14]])
-
-        last_row = new_data.iloc[[-1]]
+        X.iloc[:, [0, 1, 14]] = sc.fit_transform(X.iloc[:, [0, 1, 14]])
+        last_row = X.iloc[[-1]]
         result = model.predict(last_row)
         result
 
@@ -570,6 +571,7 @@ def testing(new_data):
   from sklearn.model_selection import train_test_split
   X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
+  X = pd.get_dummies(X, drop_first=True)
   from sklearn.preprocessing import StandardScaler
   sc = StandardScaler()
   X_train.iloc[:, [0, 1, 14]] = sc.fit_transform(X_train.iloc[:, [0, 1, 14]])
@@ -600,4 +602,4 @@ def testing(new_data):
   #modeling(forest, 'randomForest')
 
 data = pd.read_csv('trainPlane.csv')
-testing(data)
+main()
