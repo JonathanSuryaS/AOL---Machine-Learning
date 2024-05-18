@@ -144,17 +144,17 @@ def EDA(data):
 
     # Type of Travel
     TypeTravelTxt = """
-  For type of travel, customer with Business travel is easier to satisfy as the chance to be satisfied is
+    For type of travel, customer with Business travel is easier to satisfy as the chance to be satisfied is
               significantly higher, having average of satisfaction 0.6 rather than Personal travel with average of satisfaction around 0.1.
-  """
+    """
     add_section('Type of Travel', data, 'Type of Travel', TypeTravelTxt)
 
     # Class
     ClassTxt = """
-  The class shows that, the higher the class of Airline seat, starting with
+    The class shows that, the higher the class of Airline seat, starting with
               Business class, Eco Plus, and Eco, the higher the chance of passenger being satisfied, with Business Class
               having average around 0.7, followed by eco plus above 0.2 and the least is eco with average below 0.2
-  """
+    """
     add_section('Class', data, 'Class', ClassTxt)
 
     # Flight Distance
@@ -189,96 +189,96 @@ def EDA(data):
 
     # Inflight Wifi Service
     InflightWifiTxt = """
-  The pointplot shows that the Customer Satisfaction at its peak at 0 and 5, however since 0 only represented by only 3%
+    The pointplot shows that the Customer Satisfaction at its peak at 0 and 5, however since 0 only represented by only 3%
     of customer, we can safely assume that as the inflight wifi service increase (starting from 3), so is the average customer satisfaction.
-  """
+    """
     add_section('Inflight Wifi Service', data,
                 'Inflight wifi service', InflightWifiTxt)
 
     # Departure / Arrival time convenient
     DepartureTxt = """
-  Departure / Arrival Time Convenient shows that the higher the category, the lower 
+    Departure / Arrival Time Convenient shows that the higher the category, the lower 
     average of customer satisfaction
-  """
+    """
     add_section('Departure / Arrival time convenient', data,
                 'Departure/Arrival time convenient', DepartureTxt)
 
     # Ease of online booking
     EaseTxt = """
-  The pointplot of Ease of Online Booking shows the higher the category, the higher the average of customer satisfaction.
+    The pointplot of Ease of Online Booking shows the higher the category, the higher the average of customer satisfaction.
     We can see that although zero is higher than one, zero only represented b 4.3%, thus we can assume the higher the category, the higher the average satisfaction.
-  """
+    """
     add_section('Ease of online booking', data,
                 'Ease of Online booking', EaseTxt)
 
     # Gate Location
     GateTxt = """
-  For Gate Location,  category three is the lowest and the average of satisfaction decreased towards three, and then rise again.
+    For Gate Location,  category three is the lowest and the average of satisfaction decreased towards three, and then rise again.
     For category zero, it is irrelevant since it
     represented by 0%, meaning a very small portion of data.
-  """
+    """
     add_section('Gate Location', data, 'Gate location', GateTxt)
 
-# Food and Drink
+  # Food and Drink
     FoodTxt = """
-  Food and drinks also represent the same as majority, where as the category rise, so is the average of
+    Food and drinks also represent the same as majority, where as the category rise, so is the average of
     customer satisfaction, zero is also irrelevant since it only represented by 0.1%
-  """
+    """
     add_section('Food and Drink', data, 'Food and drink', FoodTxt)
 
 # Online Boarding
     BoardingTxt = """
-  Starting from category 3, the higher Online Boarding Category, the higher average of customer satisfaction, whive category below 3 
+    Starting from category 3, the higher Online Boarding Category, the higher average of customer satisfaction, whive category below 3 
     does not show much difference of average satisfaction
-  """
+    """
     add_section('Online Boarding', data, 'Online boarding', BoardingTxt)
 
     # Seat Comfort
     SeatTxt = """
-  Seat comfort also represent the same thing, while the category below 3 does not show much difference between
+    Seat comfort also represent the same thing, while the category below 3 does not show much difference between
     average of satisfaction, higher category than 3 shows higher average of satisfaction.
-  """
+    """
+    add_section('Seat Comfort', data, 'Seat comfort', SeatTxt)
 
     # Inflight Entertainment
     EntTxt = """
-  Inflight Entertainment shows that the higher the category of Inflight Entertainment, the higher the average
+    Inflight Entertainment shows that the higher the category of Inflight Entertainment, the higher the average
     of customer satisfaction
-  """
-    add_section('Inflight Entertainment', data,
-                'Inflight entertainment', EntTxt)
+    """
+    add_section('Inflight Entertainment', data,'Inflight entertainment', EntTxt)
 
     # On - Board Service
     BoardTxt = """
       On - Board Service shows athat the higher the category of On - Board Service, the higher the average
       of customer satisfaction
-    """
+      """
     add_section('On - Board Service', data, 'On-board service', BoardTxt)
 
     # Leg Room Service
     LegTxt = """
-  Leg Room Service also shows the same, the higher, the greater average of customer satisfaction.
+    Leg Room Service also shows the same, the higher, the greater average of customer satisfaction.
     However, category 2 and 3 is not showing much difference
-  """
+    """
     add_section('Leg room service', data, 'Leg room service', LegTxt)
 
     # Baggage Handling
     BaggageTxt = """
-  Baggage handling shows the higher the category, the higher average of customer satisfaction. But it can be seen 
+    Baggage handling shows the higher the category, the higher average of customer satisfaction. But it can be seen 
     that the average of satisfaction slightly decrease for category 3.
-  """
+    """
     add_section('Baggage Handling', data, 'Baggage handling', BaggageTxt)
 
     # Inflight Service
     ServiceTxt = """
-  Inflight Service shows also shows the higher the category, the higher average satisfaction of customer. However, it can be seen
+    Inflight Service shows also shows the higher the category, the higher average satisfaction of customer. However, it can be seen
     that the average of satisfaction slightly decrease for category 3.
-  """
+    """
     add_section('Inflight Service', data, 'Inflight service', ServiceTxt)
 
     # Cleanliness
     CleanTxt = """
-  For Cleanliness, it shows that as the higher category, so is the average of customer satisfaction.
-  """
+    For Cleanliness, it shows that as the higher category, so is the average of customer satisfaction.
+    """
     add_section('Cleanliness', data, 'Cleanliness', CleanTxt)
 
     # Departure  & Arrival Delay in Minutes
@@ -463,20 +463,22 @@ def prediction(data):
     PredictButton = st.button("Predict Result")
     if PredictButton:
         new_data = data
-        new_data.loc[new_data['satisfaction']=='satisfied', 'satisfaction'] = 1
-        new_data.loc[new_data['satisfaction']=='neutral or dissatisfied', 'satisfaction'] = 0
+        new_data.loc[new_data['satisfaction']
+                     == 'satisfied', 'satisfaction'] = 1
+        new_data.loc[new_data['satisfaction'] ==
+                     'neutral or dissatisfied', 'satisfaction'] = 0
         new_data['satisfaction'] = new_data['satisfaction'].astype(int)
-        new_data.dropna(inplace= True)
-        new_data.drop(columns=['id', 'Unnamed: 0'], inplace = True)
-      
-        X = new_data.drop(columns=['satisfaction', 'Cleanliness', 'Departure Delay in Minutes', 'Inflight wifi service'])
-        input_data.drop(columns=['Cleanliness', 'Departure Delay in Minutes', 'Inflight wifi service'], inplace=True)
+        new_data.dropna(inplace=True)
+        new_data.drop(columns=['id', 'Unnamed: 0'], inplace=True)
 
-      
+        X = new_data.drop(columns=['satisfaction', 'Cleanliness',
+                          'Departure Delay in Minutes', 'Inflight wifi service'])
+        input_data.drop(columns=[
+                        'Cleanliness', 'Departure Delay in Minutes', 'Inflight wifi service'], inplace=True)
+
         X = pd.concat([X, input_data], ignore_index=True)
         X
         X = pd.get_dummies(X, drop_first=True)
-
 
         from sklearn.preprocessing import StandardScaler
         sc = StandardScaler()
@@ -553,53 +555,58 @@ container_css = """
 </style>
 """
 
+
 def testing(new_data):
-  new_data.loc[new_data['satisfaction']=='satisfied', 'satisfaction'] = 1
-  new_data.loc[new_data['satisfaction']=='neutral or dissatisfied', 'satisfaction'] = 0
-  new_data['satisfaction'] = new_data['satisfaction'].astype(int)
-  new_data.dropna(inplace= True)
-  (new_data.isnull().sum()).sum()
-  new_data.drop(columns=['id', 'Unnamed: 0'], inplace = True)
-  st.write(new_data.isnull().sum())
+    new_data.loc[new_data['satisfaction'] == 'satisfied', 'satisfaction'] = 1
+    new_data.loc[new_data['satisfaction'] ==
+                 'neutral or dissatisfied', 'satisfaction'] = 0
+    new_data['satisfaction'] = new_data['satisfaction'].astype(int)
+    new_data.dropna(inplace=True)
+    (new_data.isnull().sum()).sum()
+    new_data.drop(columns=['id', 'Unnamed: 0'], inplace=True)
+    st.write(new_data.isnull().sum())
 
-  X = new_data.drop(columns=['satisfaction', 'Cleanliness', 'Departure Delay in Minutes', 'Inflight wifi service'])
-  y = new_data['satisfaction']
+    X = new_data.drop(columns=['satisfaction', 'Cleanliness',
+                      'Departure Delay in Minutes', 'Inflight wifi service'])
+    y = new_data['satisfaction']
 
-  X = pd.get_dummies(X, drop_first=True)
-  X
+    X = pd.get_dummies(X, drop_first=True)
+    X
 
-  from sklearn.model_selection import train_test_split
-  X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=0)
 
-  X = pd.get_dummies(X, drop_first=True)
-  from sklearn.preprocessing import StandardScaler
-  sc = StandardScaler()
-  X_train.iloc[:, [0, 1, 14]] = sc.fit_transform(X_train.iloc[:, [0, 1, 14]])
-  X_test.iloc[:, [0, 1, 14]] = sc.transform(X_test.iloc[:, [0, 1, 14]])
+    X = pd.get_dummies(X, drop_first=True)
+    from sklearn.preprocessing import StandardScaler
+    sc = StandardScaler()
+    X_train.iloc[:, [0, 1, 14]] = sc.fit_transform(X_train.iloc[:, [0, 1, 14]])
+    X_test.iloc[:, [0, 1, 14]] = sc.transform(X_test.iloc[:, [0, 1, 14]])
 
-  from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix, ConfusionMatrixDisplay
-  from sklearn.model_selection import cross_val_score
+    from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix, ConfusionMatrixDisplay
+    from sklearn.model_selection import cross_val_score
 
-  def modeling(model, name):
-      y_pred = model.predict(X_test)
-      score = cross_val_score(model, X_train, y_train, cv=10)
-      print(f'{name} Evaluation')
-      print('Model Accuracy: ', accuracy_score(y_test, y_pred))
-      print('Model Precission: ', precision_score(y_test, y_pred))
-      print('Model Recall: ', recall_score(y_test, y_pred))
-      print('Cross Validation (10): ', score.mean())
-      cm = confusion_matrix(y_test, y_pred)
-      disp = ConfusionMatrixDisplay(confusion_matrix=cm)
-      disp.plot()
-      st.write(cm)
+    def modeling(model, name):
+        y_pred = model.predict(X_test)
+        score = cross_val_score(model, X_train, y_train, cv=10)
+        print(f'{name} Evaluation')
+        print('Model Accuracy: ', accuracy_score(y_test, y_pred))
+        print('Model Precission: ', precision_score(y_test, y_pred))
+        print('Model Recall: ', recall_score(y_test, y_pred))
+        print('Cross Validation (10): ', score.mean())
+        cm = confusion_matrix(y_test, y_pred)
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+        disp.plot()
+        st.write(cm)
 
-  with open('random_forest.pkl', 'rb') as file:
+    with open('random_forest.pkl', 'rb') as file:
         model = pickle.load(file)
-  from sklearn.ensemble import RandomForestClassifier
-  #forest = RandomForestClassifier(n_estimators=60)
-  modeling(model, 'Random Forest')
-  #feature_names = model.feature_names
-  #modeling(forest, 'randomForest')
+    from sklearn.ensemble import RandomForestClassifier
+    # forest = RandomForestClassifier(n_estimators=60)
+    modeling(model, 'Random Forest')
+    # feature_names = model.feature_names
+    # modeling(forest, 'randomForest')
+
 
 data = pd.read_csv('trainPlane.csv')
 main()
