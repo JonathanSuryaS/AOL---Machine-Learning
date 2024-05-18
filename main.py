@@ -416,8 +416,8 @@ def prediction(data):
     cleanliness = create_slider('Cleanliness', 0, 5)
     
     #Departure & Arrival Late
-    Departure = create_number_input("Departure Delay", min_value=10, max_value=1600, value=10, step=1)
-    Arrival = create_number_input("Arrival Delay", min_value=10, max_value=1600, value=10, step=1)
+    Departure = create_number_input("Departure Delay", min_value=0, max_value=1600, value=10, step=1)
+    Arrival = create_number_input("Arrival Delay", min_value=0, max_value=1600, value=10, step=1)
 
     
     #Inputted data
@@ -445,6 +445,25 @@ def prediction(data):
         'Departure Delay in Minutes': [Departure],
         'Arrival Delay in Minutes': [Arrival]
     }
+
+    df = pd.DataFrame(input_data)
+
+    # Convert categorical variables to dummy/one-hot encoded variables
+    df = pd.get_dummies(df, columns=['Gender', 'Customer Type', 'Type of Travel', 'Class'])
+
+    # Define the desired columns order
+    desired_columns = [
+        'Age', 'Flight Distance', 'Departure/Arrival time convenient', 'Ease of Online booking',
+        'Gate location', 'Food and drink', 'Online boarding', 'Seat comfort', 'Inflight entertainment',
+        'On-board service', 'Leg room service', 'Baggage handling', 'Checkin service', 'Inflight service',
+        'Arrival Delay in Minutes', 'Gender_Male', 'Customer Type_Disloyal', 'Type of Travel_Personal Travel',
+        'Class_Eco', 'Class_Eco Plus'
+    ]
+
+    # Ensure all desired columns are present in the DataFrame, adding missing columns with default values
+    for col in desired_columns:
+        if col not in df.columns:
+            df[col] = 0
     
     space()
     st.markdown("""
@@ -453,10 +472,12 @@ def prediction(data):
     input_data = pd.DataFrame(input_data)
     st.write(input_data)
     
+    new_row = pd.DataFrame(input_data, index=[len(data)])
+    new_data = pd.concat([data, new_row], ignore_index=True)
     ##Modeling
     ###Dropping undeeded columns
-    new_data = input_data.drop(columns=['Cleanliness', 'Departure Delay in Minutes', 'Inflight wifi service'])
-    
+    new_data = data.drop(columns=['Unnamed: 0', 'id', 'Cleanliness', 'Departure Delay in Minutes', 'Inflight wifi service', 'satisfaction'])
+
     ###Encoding
     new_data = pd.get_dummies(new_data, drop_first=True)
     
@@ -465,7 +486,19 @@ def prediction(data):
     sc = StandardScaler()
     new_data.iloc[:, [0, 1, 14]] = sc.fit_transform(new_data.iloc[:, [0, 1, 14]])
     
-    result = model.predict(new_data)
+    last_row = new_data.iloc[[-1]]
+    result = model.predict(last_row)
+    
+    if(result == 1):
+      set_background('77DD77')
+      st.markdown("""
+    <br><h3 style='text-align: center; color: white; font-family: Arial;'>Customer is Satisfied</h3>
+    """, unsafe_allow_html=True)
+    elif (result == 0):
+      set_background('D2372F')
+      st.markdown("""
+    <br><h3 style='text-align: center; color: white; font-family: Arial;'>Customer is not Satisfied</h3>
+    """, unsafe_allow_html=True)
 
 def main():
     # Data
@@ -523,4 +556,4 @@ container_css = """
 """
 
 data = pd.read_csv('trainPlane.csv')
-prediction(data)
+main()
