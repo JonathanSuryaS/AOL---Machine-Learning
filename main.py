@@ -7,9 +7,11 @@ import matplotlib.pyplot as plt
 # from streamlit_pandas_profiling import st_profile_report
 # simport pandas_profiling as pp
 import pickle
+from streamlit_option_menu import option_menu
 
 
 # Global Variables
+data = pd.read_csv('trainPlane.csv')
 CustomerGender = ''
 CustomerType = ''
 age = ''
@@ -32,7 +34,7 @@ inflight_service = ''
 cleanliness = ''
 
 
-def EDA(data):
+def EDA():
     def plot_distribution(data, column, title):
         fig, ax = plt.subplots(1, 2, figsize=(18, 8))
         data[column].value_counts().plot(
@@ -357,11 +359,8 @@ def EDA(data):
     """, unsafe_allow_html=True)
 
 
-def prediction(data):
-    st.session_state.prediction_menu = not st.session_state.prediction_menu
+def prediction():
     set_background('f1e0C5')
-    with open('random_forest.pkl', 'rb') as file:
-        model = pickle.load(file)
     st.markdown("""
     <br><h1 style='text-align: left; color: white; font-family: Arial;'>Does the customer satisfied with airline service?</h1>
     """, unsafe_allow_html=True)
@@ -403,76 +402,75 @@ def prediction(data):
         return slider
 
     # Insert Gender
-    CustomerGender = create_radio_input(
+    TempCustomerGender = create_radio_input(
         'Insert Customer Gender', ["Male", "Female"])
 
     # Insert Customer Type
-    CustomerType = create_radio_input(
+    TempCustomerType = create_radio_input(
         'Insert Customer Type', ["Loyal", "Disloyal"])
 
     # Age
-    age = create_number_input(
+    Tempage = create_number_input(
         "Enter your age:", min_value=0, max_value=100, value=25, step=1)
 
     # Insert Type of Travel
-    TypeTravel = create_radio_input('Insert Type of Travel', [
+    TempTypeTravel = create_radio_input('Insert Type of Travel', [
                                     'Personal Travel', 'Business travel'])
 
     # Insert Class of Airlines
-    Class = create_radio_input('Insert Travel Class', [
+    TempClass = create_radio_input('Insert Travel Class', [
                                'Business', 'Eco Plus', 'Eco'])
 
     # Inser Flight Distance
-    Distance = create_number_input(
+    TempDistance = create_number_input(
         "Flight Distance", min_value=30, max_value=5000, value=30, step=1)
 
     # Airlines Service
-    inflight_wifi = create_slider('Inflight wifi service', 0, 5)
-    departure_arrival_time = create_slider(
-        'Departure/Arrival time convenient', 0, 5)
-    online_booking = create_slider('Ease of Online booking', 0, 5)
-    gate_location = create_slider('Gate location', 0, 5)
-    food_drink = create_slider('Food and drink', 0, 5)
-    online_boarding = create_slider('Online boarding', 0, 5)
-    seat_comfort = create_slider('Seat comfort', 0, 5)
-    inflight_entertainment = create_slider('Inflight entertainment', 0, 5)
-    onboard_service = create_slider('On-board service', 0, 5)
-    legroom_service = create_slider('Leg room service', 0, 5)
-    baggage_handling = create_slider('Baggage handling', 0, 5)
-    checkin_service = create_slider('Checkin service', 0, 5)
-    inflight_service = create_slider('Inflight service', 0, 5)
-    cleanliness = create_slider('Cleanliness', 0, 5)
+    Tempinflight_wifi = create_slider('Inflight wifi service', 0, 5)
+    Tempdeparture_arrival_time = create_slider('Departure/Arrival time convenient', 0, 5)
+    Temponline_booking = create_slider('Ease of Online booking', 0, 5)
+    Tempgate_location = create_slider('Gate location', 0, 5)
+    Tempfood_drink = create_slider('Food and drink', 0, 5)
+    Temponline_boarding = create_slider('Online boarding', 0, 5)
+    Tempseat_comfort = create_slider('Seat comfort', 0, 5)
+    Tempinflight_entertainment = create_slider('Inflight entertainment', 0, 5)
+    Temponboard_service = create_slider('On-board service', 0, 5)
+    Templegroom_service = create_slider('Leg room service', 0, 5)
+    Tempbaggage_handling = create_slider('Baggage handling', 0, 5)
+    Tempcheckin_service = create_slider('Checkin service', 0, 5)
+    Tempinflight_service = create_slider('Inflight service', 0, 5)
+    Tempcleanliness = create_slider('Cleanliness', 0, 5)
 
     # Departure & Arrival Late
-    Departure = create_number_input(
+    TempDeparture = create_number_input(
         "Departure Delay", min_value=0, max_value=1600, value=10, step=1)
-    Arrival = create_number_input(
+    TempArrival = create_number_input(
         "Arrival Delay", min_value=0, max_value=1600, value=10, step=1)
 
     # Inputted data
     input_data = {
-        'Gender': [CustomerGender],
-        'Customer Type': [CustomerType],
-        'Age': [age],
-        'Type of Travel': [TypeTravel],
-        'Class': [Class],
-        'Flight Distance': [Distance],
-        'Inflight wifi service': [inflight_wifi],
-        'Departure/Arrival time convenient': [departure_arrival_time],
-        'Ease of Online booking': [online_booking],
-        'Gate location': [gate_location],
-        'Food and drink': [food_drink],
-        'Online boarding': [online_boarding],
-        'Seat comfort': [seat_comfort],
-        'Inflight entertainment': [inflight_entertainment],
-        'On-board service': [onboard_service],
-        'Leg room service': [legroom_service],
-        'Baggage handling': [baggage_handling],
-        'Checkin service': [checkin_service],
-        'Inflight service': [inflight_service],
-        'Cleanliness': [cleanliness],
-        'Departure Delay in Minutes': [Departure],
-        'Arrival Delay in Minutes': [Arrival]
+        'Gender': [TempCustomerGender],
+        'Customer Type': [TempCustomerType],
+        'Age': [Tempage],
+        'Type of Travel': [TempTypeTravel],
+        'Class': [TempClass],
+        'Flight Distance': [TempDistance],
+        'Inflight wifi service': [Tempinflight_wifi],
+        'Departure/Arrival time convenient': [Tempdeparture_arrival_time],
+        'Ease of Online booking': [Temponline_booking],
+        'Gate location': [Tempgate_location],
+        'Food and drink': [Tempfood_drink],
+        'Online boarding': [Temponline_boarding],
+        'Seat comfort': [Tempseat_comfort],
+        'Inflight entertainment': [Tempinflight_entertainment],
+        'On-board service': [Temponboard_service],
+        'Leg room service': [Templegroom_service],
+        'Baggage handling': [Tempbaggage_handling],
+        'Checkin service': [Tempcheckin_service],
+        'Inflight service': [Tempinflight_service],
+        'Cleanliness': [Tempcleanliness],
+        'Departure Delay in Minutes': [TempDeparture],
+        'Arrival Delay in Minutes': [TempArrival]
     }
 
     space()
@@ -485,89 +483,63 @@ def prediction(data):
     st.write(
         '<style>div.Widget.row-widget.stButton>div{display:flex;justify-content:center;}</style>', unsafe_allow_html=True)
     # Create a centered button
-    PredictButton = st.button("Predict Result")
+    PredictButton = st.button("Submit Data")
+    
+    space()
     if PredictButton:
-        new_data = data
-        new_data.loc[new_data['satisfaction']
-                     == 'satisfied', 'satisfaction'] = 1
-        new_data.loc[new_data['satisfaction'] ==
-                     'neutral or dissatisfied', 'satisfaction'] = 0
-        new_data['satisfaction'] = new_data['satisfaction'].astype(int)
-        new_data.dropna(inplace=True)
-        new_data.drop(columns=['id', 'Unnamed: 0'], inplace=True)
+        CustomerGender = TempCustomerGender
+        CustomerType = TempCustomerType
+        age = Tempage
+        TypeTravel = TempTypeTravel
+        Class = TempClass
+        Distance = TempDistance
+        inflight_wifi = Tempinflight_wifi
+        departure_arrival_time = Tempdeparture_arrival_time
+        online_booking = Temponline_booking
+        gate_location = Tempgate_location
+        food_drink = Tempfood_drink
+        online_boarding = Temponline_boarding
+        seat_comfort = Tempseat_comfort
+        inflight_entertainment = Tempinflight_entertainment
+        onboard_service = Temponboard_service
+        legroom_service = Templegroom_service
+        baggage_handling = Tempbaggage_handling
+        checkin_service = Tempcheckin_service
+        inflight_service = Tempinflight_service
+        cleanliness = Tempcleanliness
+        st.success('Data Submitted, Predict your data!')
 
-        X = new_data.drop(columns=['satisfaction', 'Cleanliness',
-                          'Departure Delay in Minutes', 'Inflight wifi service'])
-        input_data.drop(columns=[
-                        'Cleanliness', 'Departure Delay in Minutes', 'Inflight wifi service'], inplace=True)
 
-        X = pd.concat([X, input_data], ignore_index=True)
-        X
-        X = pd.get_dummies(X, drop_first=True)
 
-        from sklearn.preprocessing import StandardScaler
-        sc = StandardScaler()
-        X.iloc[:, [0, 1, 14]] = sc.fit_transform(X.iloc[:, [0, 1, 14]])
-        last_row = X.iloc[[-1]]
-        result = model.predict(last_row)
-        result
 
-        if (result == 1):
-            set_background('77DD77')
-            st.markdown("""
-                <br><h3 style='text-align: center; color: white; font-family: Arial;'>Customer is Satisfied</h3>
-                """, unsafe_allow_html=True)
-        elif (result == 0):
-            set_background('D2372F')
-            st.markdown("""
-            <br><h3 style='text-align: center; color: white; font-family: Arial;'>Customer is not Satisfied</h3>
-            """, unsafe_allow_html=True)
-        new_data = new_data.drop(new_data.index[-1])
-
+def ChooseModel():
+    st.markdown("""
+    <br><h1 style='text-align: left; color: white; font-family: Arial;'>Model for Classification</h1>
+    """, unsafe_allow_html=True)
 
 def main():
-    # Load your data
-    data = pd.read_csv('trainPlane.csv')
-
-    # Main Section
-    st.markdown("""
-      <h1 style='text-align: center; color: white; font-family: Arial;'>Airline Satisfaction Prediction</h1>
-      """, unsafe_allow_html=True)
-
-    # Initialize session state for sidebar navigation
-    if 'active_section' not in st.session_state:
-        st.session_state.active_section = None
-
-    # Function to reset active section
-    def set_active_section(section):
-        st.session_state.active_section = section
-
-    # Sidebar Header
-    st.sidebar.header("Program Menu")
-
-    # Homepage Button
-    if st.sidebar.button('Homepage'):
-        set_active_section('Homepage')
-
-    # Exploratory Data Analysis Button
-    if st.sidebar.button("Exploratory Data Analysis"):
-        set_active_section('EDA')
-
-    # Prediction Button
-    if st.sidebar.button("Prediction"):
-        set_active_section('Prediction')
-
-    # Display content based on active_section state
-    if st.session_state.active_section == 'Homepage':
-        st.title('Homepage')
-    elif st.session_state.active_section == 'EDA':
-        EDA(data)
-    elif st.session_state.active_section == 'Prediction':
-        prediction(data)
-        if st.sidebar.button("Option 1"):
-            prediction_option1(data)
-        if st.sidebar.button("Option 2"):
-            prediction_option2(data)
+    with st.sidebar:
+        selected = option_menu(
+            "Main Menu", 
+            ["Home", "Exploratory Data Analysis", "Input Data", "Choose Model", "Result and Evaluation"], 
+            icons=['house', 'bar-chart', 'upload', 'robot', 'check-circle'], 
+            menu_icon="cast", 
+            default_index=0
+        )
+        
+        st.write(f"You Choose: {selected}")
+    if selected == "Home":
+        st.title("Home")
+        st.write("Welcome to the Home page.")
+    elif selected == "Exploratory Data Analysis":
+        EDA()
+    elif selected == "Input Data":
+        prediction()
+    elif selected == "Choose Model":
+        ChooseModel()
+    elif selected == "Result and Evaluation":
+        st.title("Result and Evaluation")
+        st.write("View results and evaluations here.")
 
 
 def set_background(color):
@@ -602,56 +574,20 @@ container_css = """
 """
 
 
-def testing(new_data):
-    new_data.loc[new_data['satisfaction'] == 'satisfied', 'satisfaction'] = 1
-    new_data.loc[new_data['satisfaction'] ==
+def getFeatures():
+    data.loc[data['satisfaction'] == 'satisfied', 'satisfaction'] = 1
+    data.loc[data['satisfaction'] ==
                  'neutral or dissatisfied', 'satisfaction'] = 0
-    new_data['satisfaction'] = new_data['satisfaction'].astype(int)
-    new_data.dropna(inplace=True)
-    (new_data.isnull().sum()).sum()
-    new_data.drop(columns=['id', 'Unnamed: 0'], inplace=True)
-    st.write(new_data.isnull().sum())
+    data['satisfaction'] = data['satisfaction'].astype(int)
+    data.dropna(inplace=True)
+    data.drop(columns=['id', 'Unnamed: 0'], inplace=True)
 
-    X = new_data.drop(columns=['satisfaction', 'Cleanliness',
+    X = data.drop(columns=['satisfaction', 'Cleanliness',
                       'Departure Delay in Minutes', 'Inflight wifi service'])
-    y = new_data['satisfaction']
+    y = data['satisfaction']
 
     X = pd.get_dummies(X, drop_first=True)
-    X
-
-    from sklearn.model_selection import train_test_split
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=0)
-
-    X = pd.get_dummies(X, drop_first=True)
-    from sklearn.preprocessing import StandardScaler
-    sc = StandardScaler()
-    X_train.iloc[:, [0, 1, 14]] = sc.fit_transform(X_train.iloc[:, [0, 1, 14]])
-    X_test.iloc[:, [0, 1, 14]] = sc.transform(X_test.iloc[:, [0, 1, 14]])
-
-    from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix, ConfusionMatrixDisplay
-    from sklearn.model_selection import cross_val_score
-
-    def modeling(model, name):
-        y_pred = model.predict(X_test)
-        score = cross_val_score(model, X_train, y_train, cv=10)
-        print(f'{name} Evaluation')
-        print('Model Accuracy: ', accuracy_score(y_test, y_pred))
-        print('Model Precission: ', precision_score(y_test, y_pred))
-        print('Model Recall: ', recall_score(y_test, y_pred))
-        print('Cross Validation (10): ', score.mean())
-        cm = confusion_matrix(y_test, y_pred)
-        disp = ConfusionMatrixDisplay(confusion_matrix=cm)
-        disp.plot()
-        st.write(cm)
-
-    with open('random_forest.pkl', 'rb') as file:
-        model = pickle.load(file)
-    from sklearn.ensemble import RandomForestClassifier
-    # forest = RandomForestClassifier(n_estimators=60)
-    modeling(model, 'Random Forest')
-    # feature_names = model.feature_names
-    # modeling(forest, 'randomForest')
+    return X,y 
 
 
 data = pd.read_csv('trainPlane.csv')
