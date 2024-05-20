@@ -576,8 +576,7 @@ container_css = """
 
 def getFeatures():
     data.loc[data['satisfaction'] == 'satisfied', 'satisfaction'] = 1
-    data.loc[data['satisfaction'] ==
-                 'neutral or dissatisfied', 'satisfaction'] = 0
+    data.loc[data['satisfaction'] == 'neutral or dissatisfied', 'satisfaction'] = 0
     data['satisfaction'] = data['satisfaction'].astype(int)
     data.dropna(inplace=True)
     data.drop(columns=['id', 'Unnamed: 0'], inplace=True)
