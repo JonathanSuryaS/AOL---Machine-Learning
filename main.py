@@ -33,6 +33,12 @@ checkin_service = ''
 inflight_service = ''
 cleanliness = ''
 
+#Model
+Model = ''
+
+#Features
+test = ''
+result = ''
 
 def EDA():
     def plot_distribution(data, column, title):
@@ -510,12 +516,79 @@ def prediction():
         st.success('Data Submitted, Predict your data!')
 
 
+def training(selected, test_size):
+    from sklearn.model_selection import train_test_split
+    from sklearn.preprocessing import StandardScaler
+    sc = StandardScaler()
+    X, y = getFeatures()
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=0)
+    X_train.iloc[:, [0, 1, 14]] = sc.fit_transform(X_train.iloc[:, [0, 1, 14]])
+    X_test.iloc[:, [0, 1, 14]] = sc.transform(X_test.iloc[:, [0, 1, 14]])
+    test = X_test
+    result = y_test
+    
+    st.markdown("""
+    <style>
+    .training {
+        font-size: 15px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
+    #model_options = ['Logistic Regression', 'NaiveBayes',
+               #'SVM','DecisionTree','RandomForest', 'XGBoost']
+    if selected == 'Logistic Regression':
+        from sklearn.linear_model import LogisticRegression
+        Model = LogisticRegression()
+        Model.fit(X_train, y_train)
+    elif selected == 'NaiveBayes':
+        from sklearn.naive_bayes import GaussianNB
+        Model = GaussianNB()
+        Model.fit(X_train, y_train)
+    elif selected == 'SVM':
+        from sklearn.svm import SVC
+        #space()
+        st.markdown('<div class="training">Choose Kernel for SVM</div>', unsafe_allow_html=True)
+        kernel_options = ['Linear', 'Sigmoid', 'Rbf']
+        kernel = st.selectbox('', kernel_options)
+    elif selected == 'DecisionTree'
+        
+        
 
 def ChooseModel():
+    set_background('135D66')
     st.markdown("""
     <br><h1 style='text-align: left; color: white; font-family: Arial;'>Model for Classification</h1>
     """, unsafe_allow_html=True)
+    
+    
+    def create_slider(label, min_value, max_value):
+        slider = st.slider(label, min_value, max_value)
+        st.markdown(
+            """<style>
+          div[class*="stSlider"] > label > div[data-testid="stMarkdownContainer"] > p {
+              font-size: 20px;
+          }
+          </style>
+          """, unsafe_allow_html=True)
+        return slider
+    space()
+    test_size = create_slider('Insert Test Size', 10, 90)
+    
+    st.markdown("""
+    <style>
+    .custom-label {
+        font-size: 20px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    # Add a label with the custom CSS class
+    st.markdown('<div class="custom-label">Choose Models</div>', unsafe_allow_html=True)
+    
+    model_options = ['Logistic Regression', 'NaiveBayes',
+               'SVM','DecisionTree','RandomForest', 'XGBoost']
+    selected_models = st.selectbox('', model_options)
+    training(selected_models, test_size)
 
 def main():
     with st.sidebar:
@@ -527,7 +600,7 @@ def main():
             default_index=0
         )
         
-        st.write(f"You Choose: {selected}")
+        st.write(f"Section: {selected}")
     if selected == "Home":
         st.title("Home")
         st.write("Welcome to the Home page.")
@@ -558,7 +631,6 @@ def space():
     st.markdown("""
               <br><br>""", unsafe_allow_html=True)
 
-# Set the background color
 
 
 container_css = """
@@ -575,11 +647,11 @@ container_css = """
 
 
 def getFeatures():
+    data.drop(columns=['id', 'Unnamed: 0'], inplace=True)
     data.loc[data['satisfaction'] == 'satisfied', 'satisfaction'] = 1
     data.loc[data['satisfaction'] == 'neutral or dissatisfied', 'satisfaction'] = 0
     data['satisfaction'] = data['satisfaction'].astype(int)
     data.dropna(inplace=True)
-    data.drop(columns=['id', 'Unnamed: 0'], inplace=True)
 
     X = data.drop(columns=['satisfaction', 'Cleanliness',
                       'Departure Delay in Minutes', 'Inflight wifi service'])
