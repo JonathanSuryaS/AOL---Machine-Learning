@@ -12,30 +12,34 @@ from streamlit_option_menu import option_menu
 
 # Global Variables
 data = pd.read_csv('trainPlane.csv')
-CustomerGender = ''
-CustomerType = ''
-age = ''
-TypeTravel = ''
-Class = ''
-Distance = ''
-inflight_wifi = ''
-departure_arrival_time = ''
-online_booking = ''
-gate_location = ''
-food_drink = ''
-online_boarding = ''
-seat_comfort = ''
-inflight_entertainment = ''
-onboard_service = ''
-legroom_service = ''
-baggage_handling = ''
-checkin_service = ''
-inflight_service = ''
-cleanliness = ''
+CustomerGende= None
+CustomerType = None
+age = None
+TypeTravel = None 
+Class = None
+Distance = None
+inflight_wifi = None
+departure_arrival_time = None
+online_booking = None
+gate_location = None
+food_drink = None
+online_boarding = None
+seat_comfort = None
+inflight_entertainment = None
+onboard_service = None
+legroom_service = None
+baggage_handling = None
+checkin_service = None
+inflight_service = None
+cleanliness = None
 
 #Model
-global Model
 Model = None
+
+test = None
+result = None
+train = None
+validation = None
 
 
 def EDA():
@@ -576,23 +580,23 @@ def Logistic():
     n_jobs = st.slider('Number of jobs (parallelization, default=1)', -1, 4, 1)
     random_state = st.slider('Random state (default=None)', 0, 100, 42)
 
-    
-    log_reg = LogisticRegression(
-        penalty=penalty,
-        C=C,
-        solver=solver,
-        l1_ratio=l1_ratio,
-        max_iter=max_iter,
-        tol=tol,
-        class_weight=class_weight,
-        verbose=verbose,
-        n_jobs=n_jobs,
-        random_state=random_state
-    )
-    global Model
-    Model = log_reg.fit(train, validation)
-    
-    
+    predict = st.button('Deploy Model')
+    if predict:
+        global Model
+        Model = LogisticRegression(
+            penalty=penalty,
+            C=C,
+            solver=solver,
+            l1_ratio=l1_ratio,
+            max_iter=max_iter,
+            tol=tol,
+            class_weight=class_weight,
+            verbose=verbose,
+            n_jobs=n_jobs,
+            random_state=random_state
+        )
+        Model.fit(train, validation)
+            
     
 def svm():
     from sklearn.svm import SVC
@@ -681,6 +685,13 @@ def ChooseModel():
     selected_models = st.selectbox('', model_options)
     training(selected_models, test_size)
 
+
+def evaluation():
+    Model.predict(test)
+
+
+
+
 def main():
     with st.sidebar:
         selected = option_menu(
@@ -703,7 +714,7 @@ def main():
         ChooseModel()
     elif selected == "Result and Evaluation":
         st.title("Result and Evaluation")
-        st.write("View results and evaluations here.")
+        evaluation()
 
 
 def set_background(color):
