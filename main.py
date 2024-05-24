@@ -582,8 +582,7 @@ def Logistic():
 
     predict = st.button('Deploy Model')
     if predict:
-        global Model
-        Model = LogisticRegression(
+        model = LogisticRegression(
             penalty=penalty,
             C=C,
             solver=solver,
@@ -595,7 +594,9 @@ def Logistic():
             n_jobs=n_jobs,
             random_state=random_state
         )
-        Model.fit(train, validation)
+        model.fit(train, validation)
+        global Model
+        Model = model
             
     
 def svm():
@@ -687,13 +688,23 @@ def ChooseModel():
 
 
 def evaluation():
-    Model.predict(test)
+    train
+    validation
+    test
+    result
 
 
 
 
 def main():
+    # Get the session state
+    session_state = st.session_state
+    
     with st.sidebar:
+        # Initialize selected section if it doesn't exist in the session state
+        if "selected_section" not in session_state:
+            session_state.selected_section = "Home"
+        
         selected = option_menu(
             "Main Menu", 
             ["Home", "Exploratory Data Analysis", "Input Data", "Choose Model", "Result and Evaluation"], 
@@ -703,6 +714,13 @@ def main():
         )
         
         st.write(f"Section: {selected}")
+        
+        # Update the selected section in the session state
+        session_state.selected_section = selected
+
+    # Get the selected section from session state
+    selected = session_state.selected_section
+
     if selected == "Home":
         st.title("Home")
         st.write("Welcome to the Home page.")
