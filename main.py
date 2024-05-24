@@ -34,11 +34,9 @@ inflight_service = ''
 cleanliness = ''
 
 #Model
-Model = ''
+global Model
+Model = None
 
-#Features
-test = ''
-result = ''
 
 def EDA():
     def plot_distribution(data, column, title):
@@ -524,6 +522,9 @@ def training(selected, test_size):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=0)
     X_train.iloc[:, [0, 1, 14]] = sc.fit_transform(X_train.iloc[:, [0, 1, 14]])
     X_test.iloc[:, [0, 1, 14]] = sc.transform(X_test.iloc[:, [0, 1, 14]])
+    global train, validation, test, result
+    train = X_train
+    validation = y_train
     test = X_test
     result = y_test
     
@@ -538,21 +539,111 @@ def training(selected, test_size):
     #model_options = ['Logistic Regression', 'NaiveBayes',
                #'SVM','DecisionTree','RandomForest', 'XGBoost']
     if selected == 'Logistic Regression':
-        from sklearn.linear_model import LogisticRegression
-        Model = LogisticRegression()
-        Model.fit(X_train, y_train)
+        Logistic()
     elif selected == 'NaiveBayes':
         from sklearn.naive_bayes import GaussianNB
         Model = GaussianNB()
         Model.fit(X_train, y_train)
     elif selected == 'SVM':
-        from sklearn.svm import SVC
-        #space()
-        st.markdown('<div class="training">Choose Kernel for SVM</div>', unsafe_allow_html=True)
-        kernel_options = ['Linear', 'Sigmoid', 'Rbf']
-        kernel = st.selectbox('', kernel_options)
-    elif selected == 'DecisionTree'
-        
+        svm()
+
+def Logistic():
+    from sklearn.linear_model import LogisticRegression
+    st.title("Logistic Regression Parameter Tuning")
+
+    penalty_options = ['None (default)', 'l2', 'l1', 'elasticnet']
+    penalty_map = {'None (default)': None, 'l2': 'l2', 'l1': 'l1', 'elasticnet': 'elasticnet'}
+    penalty = penalty_map[st.selectbox('Penalty', penalty_options)]
+
+    C = st.slider('C (Inverse of regularization strength, default=1.0)', 0.01, 10.0, 1.0)
+
+    solver_options = ['lbfgs (default)', 'newton-cg', 'liblinear', 'sag', 'saga']
+    solver_map = {'lbfgs (default)': 'lbfgs', 'newton-cg': 'newton-cg', 'liblinear': 'liblinear', 'sag': 'sag', 'saga': 'saga'}
+    solver = solver_map[st.selectbox('Solver', solver_options)]
+
+    
+    if penalty == 'elasticnet':
+        l1_ratio = st.slider('l1_ratio (for elasticnet, default=0.5)', 0.0, 1.0, 0.5)
+    else:
+        l1_ratio = None
+
+    max_iter = st.slider('Max iterations (default=100)', 100, 1000, 100)
+    tol = st.slider('Tolerance for stopping criteria (default=1e-4)', 1e-5, 1e-1, 1e-4)
+    class_weight_options = ['None (default)', 'balanced']
+    class_weight_map = {'None (default)': None, 'balanced': 'balanced'}
+    class_weight = class_weight_map[st.selectbox('Class weight', class_weight_options)]
+    verbose = st.checkbox('Verbose (default=False)', value=False)
+    n_jobs = st.slider('Number of jobs (parallelization, default=1)', -1, 4, 1)
+    random_state = st.slider('Random state (default=None)', 0, 100, 42)
+
+    
+    log_reg = LogisticRegression(
+        penalty=penalty,
+        C=C,
+        solver=solver,
+        l1_ratio=l1_ratio,
+        max_iter=max_iter,
+        tol=tol,
+        class_weight=class_weight,
+        verbose=verbose,
+        n_jobs=n_jobs,
+        random_state=random_state
+    )
+    global Model
+    Model = log_reg.fit(train, validation)
+    
+    
+    
+def svm():
+    from sklearn.svm import SVC
+    st.title("SVC Parameter Tuning")
+    
+    # Define the parameter options
+    kernel_options = ['linear', 'poly', 'rbf', 'sigmoid']
+    kernel = st.selectbox('Kernel', kernel_options)
+    
+    C = st.slider('C (Regularization parameter)', 0.01, 10.0, 1.0)
+    degree = st.slider('Degree (for poly kernel)', 1, 5, 3)
+    gamma_options = ['scale', 'auto']
+    gamma = st.selectbox('Gamma', gamma_options)
+    coef0 = ''
+    if kernel in ['poly', 'sigmoid']:
+        coef0 = st.slider('Coef0 (for poly/sigmoid kernels)', 0.0, 1.0, 0.0)
+    else:
+        coef0 = 0.0  # Default value for other kernels
+    shrinking = st.checkbox('Shrinking', value=True)
+    probability = st.checkbox('Probability', value=False)
+    tol = st.slider('Tolerance for stopping criterion', 1e-5, 1e-1, 1e-3)
+    cache_size = st.slider('Cache size (MB)', 100, 1000, 200)
+    class_weight_options = ['None', 'balanced']
+    class_weight = st.selectbox('Class weight', class_weight_options)
+    class_weight = None if class_weight == 'None' else 'balanced'
+    verbose = st.checkbox('Verbose', value=False)
+    max_iter = st.slider('Max iterations', -1, 1000, -1)
+    decision_function_shape_options = ['ovr', 'ovo']
+    decision_function_shape = st.selectbox('Decision function shape', decision_function_shape_options)
+    break_ties = st.checkbox('Break ties', value=False)
+    random_state = st.slider('Random state', 0, 100, 42)
+    
+    svc = SVC(
+        C=C,
+        kernel=kernel,
+        degree=degree,
+        gamma=gamma,
+        coef0=coef0,
+        shrinking=shrinking,
+        probability=probability,
+        tol=tol,
+        cache_size=cache_size,
+        class_weight=class_weight,
+        verbose=verbose,
+        max_iter=max_iter,
+        decision_function_shape=decision_function_shape,
+        break_ties=break_ties,
+        random_state=random_state
+    )   
+    global Model
+    Model = svc.fit(train, validation)
         
 
 def ChooseModel():
