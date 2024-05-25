@@ -2,6 +2,7 @@
 import streamlit as st
 import pandas as pd
 import seaborn as sns
+import numpy as np
 import matplotlib.pyplot as plt
 # from ydata_profiling import ProfileReport
 # from streamlit_pandas_profiling import st_profile_report
@@ -12,82 +13,23 @@ from streamlit_option_menu import option_menu
 
 # Global Variables
 data = pd.read_csv('trainPlane.csv')
-if 'CustomerGende' not in st.session_state:
-    st.session_state.CustomerGende = None
-
-if 'CustomerType' not in st.session_state:
-    st.session_state.CustomerType = None
-
-if 'age' not in st.session_state:
-    st.session_state.age = None
-
-if 'TypeTravel' not in st.session_state:
-    st.session_state.TypeTravel = None
-
-if 'Class' not in st.session_state:
-    st.session_state.Class = None
-
-if 'Distance' not in st.session_state:
-    st.session_state.Distance = None
-
-if 'inflight_wifi' not in st.session_state:
-    st.session_state.inflight_wifi = None
-
-if 'departure_arrival_time' not in st.session_state:
-    st.session_state.departure_arrival_time = None
-
-if 'online_booking' not in st.session_state:
-    st.session_state.online_booking = None
-
-if 'gate_location' not in st.session_state:
-    st.session_state.gate_location = None
-
-if 'food_drink' not in st.session_state:
-    st.session_state.food_drink = None
-
-if 'online_boarding' not in st.session_state:
-    st.session_state.online_boarding = None
-
-if 'seat_comfort' not in st.session_state:
-    st.session_state.seat_comfort = None
-
-if 'inflight_entertainment' not in st.session_state:
-    st.session_state.inflight_entertainment = None
-
-if 'onboard_service' not in st.session_state:
-    st.session_state.onboard_service = None
-
-if 'legroom_service' not in st.session_state:
-    st.session_state.legroom_service = None
-
-if 'baggage_handling' not in st.session_state:
-    st.session_state.baggage_handling = None
-
-if 'checkin_service' not in st.session_state:
-    st.session_state.checkin_service = None
-
-if 'inflight_service' not in st.session_state:
-    st.session_state.inflight_service = None
-
-if 'cleanliness' not in st.session_state:
-    st.session_state.cleanliness = None
-
-# Model related session state variables
+if 'to_predict' not in st.session_state:
+    st.session_state.to_predict = None
+if 'sc' not in st.session_state:
+    from sklearn.preprocessing import StandardScaler
+    st.session_state.sc = StandardScaler()
+if 'ct' not in st.session_state:
+    from sklearn.preprocessing import OneHotEncoder
+    from sklearn.compose import ColumnTransformer
+    columns_to_encode = [0, 1, 3, 4]
+    st.session_state.ct = ColumnTransformer(
+        transformers=[
+            ('encode', OneHotEncoder(), columns_to_encode)
+        ],
+        remainder='passthrough'  # Keep the rest of the columns as is
+    )
 if 'Model' not in st.session_state:
-    st.session_state.Model = None
-
-if 'test' not in st.session_state:
-    st.session_state.test = None
-
-if 'result' not in st.session_state:
-    st.session_state.result = None
-
-if 'train' not in st.session_state:
-    st.session_state.train = None
-
-if 'validation' not in st.session_state:
-    st.session_state.validation = None
-
+    Model = None
 
 def EDA():
     def plot_distribution(data, column, title):
@@ -462,7 +404,7 @@ def prediction():
 
     # Insert Customer Type
     TempCustomerType = create_radio_input(
-        'Insert Customer Type', ["Loyal", "Disloyal"])
+        'Insert Customer Type', ["Loyal Customer", "Disloyal Customer"])
 
     # Age
     Tempage = create_number_input(
@@ -542,27 +484,9 @@ def prediction():
     
     space()
     if PredictButton:
-        st.session_state.CustomerGender = TempCustomerGender
-        st.session_state.CustomerType = TempCustomerType
-        st.session_state.age = Tempage
-        st.session_state.TypeTravel = TempTypeTravel
-        st.session_state.Class = TempClass
-        st.session_state.Distance = TempDistance
-        st.session_state.inflight_wifi = Tempinflight_wifi
-        st.session_state.departure_arrival_time = Tempdeparture_arrival_time
-        st.session_state.online_booking = Temponline_booking
-        st.session_state.gate_location = Tempgate_location
-        st.session_state.food_drink = Tempfood_drink
-        st.session_state.online_boarding = Temponline_boarding
-        st.session_state.seat_comfort = Tempseat_comfort
-        st.session_state.inflight_entertainment = Tempinflight_entertainment
-        st.session_state.onboard_service = Temponboard_service
-        st.session_state.legroom_service = Templegroom_service
-        st.session_state.baggage_handling = Tempbaggage_handling
-        st.session_state.checkin_service = Tempcheckin_service
-        st.session_state.inflight_service = Tempinflight_service
-        st.session_state.cleanliness = Tempcleanliness
-        st.success('Data Submitted, Predict your data!')
+        input_data.drop(columns=['Cleanliness', 'Departure Delay in Minutes', 'Inflight wifi service'], inplace= True)
+        st.session_state.to_predict = input_data
+        st.success('Data Submitted, Create your model to predict!')
 
 def getFeatures():
     data.drop(columns=['id', 'Unnamed: 0'], inplace=True)
@@ -572,21 +496,18 @@ def getFeatures():
     data.dropna(inplace=True)
 
     X = data.drop(columns=['satisfaction', 'Cleanliness',
-                      'Departure Delay in Minutes', 'Inflight wifi service'])
-    y = data['satisfaction']
-
-    X = pd.get_dummies(X, drop_first=True)
+                      'Departure Delay in Minutes', 'Inflight wifi service']).values
+    y = data['satisfaction'].values
+    X = np.array(st.session_state.ct.fit_transform(X))
     return X,y 
 
 def training(selected, test_size):
     from sklearn.model_selection import train_test_split
-    from sklearn.preprocessing import StandardScaler
-    sc = StandardScaler()
     X, y = getFeatures()
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=0)
-    X_train.iloc[:, [0, 1, 14]] = sc.fit_transform(X_train.iloc[:, [0, 1, 14]])
-    X_test.iloc[:, [0, 1, 14]] = sc.transform(X_test.iloc[:, [0, 1, 14]])
-    global train, validation, test, result
+    columns_to_scale = [9, 10, 23]
+    X_train[:, columns_to_scale] = st.session_state.sc.fit_transform(X_train[:, columns_to_scale])
+    X_test[:, columns_to_scale] = st.session_state.sc.transform(X_test[:, columns_to_scale])
     st.session_state.train = X_train
     st.session_state.validation = y_train
     st.session_state.test = X_test
@@ -602,15 +523,19 @@ def training(selected, test_size):
 
     #model_options = ['Logistic Regression', 'NaiveBayes',
                #'SVM','DecisionTree','RandomForest', 'XGBoost']
+    space()
     if selected == 'Logistic Regression':
         Logistic()
     elif selected == 'NaiveBayes':
-        from sklearn.naive_bayes import GaussianNB
-        Model = GaussianNB()
-        Model.fit(X_train, y_train)
-    elif selected == 'SVM':
-        svm()
-
+        NaiveBayes()
+    elif selected == 'DecisionTree':
+        DecisionTree()
+    elif selected == 'RandomForest':
+        RandomForest()
+    elif selected == 'XGBoost':
+        XGBoost()
+        
+# Model Model untuk Klasifikasi
 def Logistic():
     from sklearn.linear_model import LogisticRegression
     st.title("Logistic Regression Parameter Tuning")
@@ -656,60 +581,167 @@ def Logistic():
         )
         model.fit(st.session_state.train, st.session_state.validation)
         st.session_state.Model = model
-            
-    
-def svm():
-    from sklearn.svm import SVC
-    st.title("SVC Parameter Tuning")
-    
-    # Define the parameter options
-    kernel_options = ['linear', 'poly', 'rbf', 'sigmoid']
-    kernel = st.selectbox('Kernel', kernel_options)
-    
-    C = st.slider('C (Regularization parameter)', 0.01, 10.0, 1.0)
-    degree = st.slider('Degree (for poly kernel)', 1, 5, 3)
-    gamma_options = ['scale', 'auto']
-    gamma = st.selectbox('Gamma', gamma_options)
-    coef0 = ''
-    if kernel in ['poly', 'sigmoid']:
-        coef0 = st.slider('Coef0 (for poly/sigmoid kernels)', 0.0, 1.0, 0.0)
-    else:
-        coef0 = 0.0  # Default value for other kernels
-    shrinking = st.checkbox('Shrinking', value=True)
-    probability = st.checkbox('Probability', value=False)
-    tol = st.slider('Tolerance for stopping criterion', 1e-5, 1e-1, 1e-3)
-    cache_size = st.slider('Cache size (MB)', 100, 1000, 200)
-    class_weight_options = ['None', 'balanced']
-    class_weight = st.selectbox('Class weight', class_weight_options)
-    class_weight = None if class_weight == 'None' else 'balanced'
-    verbose = st.checkbox('Verbose', value=False)
-    max_iter = st.slider('Max iterations', -1, 1000, -1)
-    decision_function_shape_options = ['ovr', 'ovo']
-    decision_function_shape = st.selectbox('Decision function shape', decision_function_shape_options)
-    break_ties = st.checkbox('Break ties', value=False)
-    random_state = st.slider('Random state', 0, 100, 42)
-    
+        st.success('Model Created, please check Result and Evaluation')
+
+def DecisionTree():
+    from sklearn.tree import DecisionTreeClassifier
+    st.title("Decision Tree Parameter Tuning")
+
+    criterion_options = ['gini (default)', 'entropy', 'log_loss']
+    criterion_map = {'gini (default)': 'gini', 'entropy': 'entropy', 'log_loss': 'log_loss'}
+    criterion = criterion_map[st.selectbox('Criterion', criterion_options)]
+
+    splitter_options = ['best (default)', 'random']
+    splitter = st.selectbox('Splitter', splitter_options, index=0)
+
+    max_depth = st.slider('Max depth (default=None)', 1, 100, 10)
+    min_samples_split = st.slider('Min samples split (default=2)', 2, 20, 2)
+    min_samples_leaf = st.slider('Min samples leaf (default=1)', 1, 20, 1)
+    max_features = st.slider('Max features (default=None)', 1, st.session_state.train.shape[1], st.session_state.train.shape[1])
+    random_state = st.slider('Random state (default=None)', 0, 100, 42)
+
     predict = st.button('Deploy Model')
     if predict:
-        svc = SVC(
-            C=C,
-            kernel=kernel,
-            degree=degree,
-            gamma=gamma,
-            coef0=coef0,
-            shrinking=shrinking,
-            probability=probability,
-            tol=tol,
-            cache_size=cache_size,
-            class_weight=class_weight,
-            verbose=verbose,
-            max_iter=max_iter,
-            decision_function_shape=decision_function_shape,
-            break_ties=break_ties,
+        model = DecisionTreeClassifier(
+            criterion=criterion,
+            splitter=splitter,
+            max_depth=max_depth,
+            min_samples_split=min_samples_split,
+            min_samples_leaf=min_samples_leaf,
+            max_features=max_features,
             random_state=random_state
-        )   
-        svc.fit(st.session_state.train, st.session_state.validation)
-        st.session_state.Model = svc
+        )
+        model.fit(st.session_state.train, st.session_state.validation)
+        st.session_state.Model = model
+
+def RandomForest():
+    from sklearn.ensemble import RandomForestClassifier
+    st.title("Random Forest Parameter Tuning")
+
+    n_estimators = st.slider('Number of estimators (default=100)', 10, 500, 100)
+    criterion_options = ['gini (default)', 'entropy', 'log_loss']
+    criterion_map = {'gini (default)': 'gini', 'entropy': 'entropy', 'log_loss': 'log_loss'}
+    criterion = criterion_map[st.selectbox('Criterion', criterion_options)]
+
+    max_depth = st.slider('Max depth (default=None)', 1, 100, 10)
+    min_samples_split = st.slider('Min samples split (default=2)', 2, 20, 2)
+    min_samples_leaf = st.slider('Min samples leaf (default=1)', 1, 20, 1)
+    max_features = st.slider('Max features (default=None)', 1, st.session_state.train.shape[1], st.session_state.train.shape[1])
+    random_state = st.slider('Random state (default=None)', 0, 100, 42)
+    n_jobs = st.slider('Number of jobs (parallelization, default=1)', -1, 4, 1)
+    verbose = st.checkbox('Verbose (default=False)', value=False)
+
+    predict = st.button('Deploy Model')
+    if predict:
+        model = RandomForestClassifier(
+            n_estimators=n_estimators,
+            criterion=criterion,
+            max_depth=max_depth,
+            min_samples_split=min_samples_split,
+            min_samples_leaf=min_samples_leaf,
+            max_features=max_features,
+            random_state=random_state,
+            n_jobs=n_jobs,
+            verbose=verbose
+        )
+        model.fit(st.session_state.train, st.session_state.validation)
+        st.session_state.Model = model
+
+def NaiveBayes():
+    from sklearn.naive_bayes import GaussianNB
+    st.title("Naive Bayes Parameter Tuning")
+
+    st.write("Gaussian Naive Bayes does not have hyperparameters to tune in the same way other models do. Click 'Deploy Model' to use the default Gaussian Naive Bayes model.")
+
+    predict = st.button('Deploy Model')
+    if predict:
+        model = GaussianNB()
+        model.fit(st.session_state.train, st.session_state.validation)
+        st.session_state.Model = model
+
+def XGBoost():
+    from xgboost import XGBClassifier
+    st.title("XGBoost Parameter Tuning")
+
+    n_estimators = st.slider('Number of estimators (default=100)', 10, 500, 100)
+    max_depth = st.slider('Max depth (default=6)', 1, 15, 6)
+    learning_rate = st.slider('Learning rate (default=0.3)', 0.01, 1.0, 0.3)
+    subsample = st.slider('Subsample (default=1.0)', 0.1, 1.0, 1.0)
+    colsample_bytree = st.slider('Colsample by tree (default=1.0)', 0.1, 1.0, 1.0)
+    gamma = st.slider('Gamma (default=0)', 0.0, 10.0, 0.0)
+    random_state = st.slider('Random state (default=0)', 0, 100, 0)
+    n_jobs = st.slider('Number of jobs (parallelization, default=1)', -1, 4, 1)
+    verbosity = st.slider('Verbosity (default=1)', 0, 3, 1)
+
+    predict = st.button('Deploy Model')
+    if predict:
+        model = XGBClassifier(
+            n_estimators=n_estimators,
+            max_depth=max_depth,
+            learning_rate=learning_rate,
+            subsample=subsample,
+            colsample_bytree=colsample_bytree,
+            gamma=gamma,
+            random_state=random_state,
+            n_jobs=n_jobs,
+            verbosity=verbosity
+        )
+        model.fit(st.session_state.train, st.session_state.validation)
+        st.session_state.Model = model
+
+
+# def svm():
+#     from sklearn.svm import SVC
+#     st.title("SVC Parameter Tuning")
+    
+#     # Define the parameter options
+#     kernel_options = ['linear', 'poly', 'rbf', 'sigmoid']
+#     kernel = st.selectbox('Kernel', kernel_options)
+    
+#     C = st.slider('C (Regularization parameter)', 0.01, 10.0, 1.0)
+#     degree = st.slider('Degree (for poly kernel)', 1, 5, 3)
+#     gamma_options = ['scale', 'auto']
+#     gamma = st.selectbox('Gamma', gamma_options)
+#     coef0 = ''
+#     if kernel in ['poly', 'sigmoid']:
+#         coef0 = st.slider('Coef0 (for poly/sigmoid kernels)', 0.0, 1.0, 0.0)
+#     else:
+#         coef0 = 0.0  # Default value for other kernels
+#     shrinking = st.checkbox('Shrinking', value=True)
+#     probability = st.checkbox('Probability', value=False)
+#     tol = st.slider('Tolerance for stopping criterion', 1e-5, 1e-1, 1e-3)
+#     cache_size = st.slider('Cache size (MB)', 100, 1000, 200)
+#     class_weight_options = ['None', 'balanced']
+#     class_weight = st.selectbox('Class weight', class_weight_options)
+#     class_weight = None if class_weight == 'None' else 'balanced'
+#     verbose = st.checkbox('Verbose', value=False)
+#     max_iter = st.slider('Max iterations', -1, 1000, -1)
+#     decision_function_shape_options = ['ovr', 'ovo']
+#     decision_function_shape = st.selectbox('Decision function shape', decision_function_shape_options)
+#     break_ties = st.checkbox('Break ties', value=False)
+#     random_state = st.slider('Random state', 0, 100, 42)
+    
+#     predict = st.button('Deploy Model')
+#     if predict:
+#         svc = SVC(
+#             C=C,
+#             kernel=kernel,
+#             degree=degree,
+#             gamma=gamma,
+#             coef0=coef0,
+#             shrinking=shrinking,
+#             probability=probability,
+#             tol=tol,
+#             cache_size=cache_size,
+#             class_weight=class_weight,
+#             verbose=verbose,
+#             max_iter=max_iter,
+#             decision_function_shape=decision_function_shape,
+#             break_ties=break_ties,
+#             random_state=random_state
+#         )   
+#         svc.fit(st.session_state.train, st.session_state.validation)
+#         st.session_state.Model = svc
         
 
 def ChooseModel():
@@ -729,8 +761,7 @@ def ChooseModel():
           </style>
           """, unsafe_allow_html=True)
         return slider
-    space()
-    test_size = create_slider('Insert Test Size', 10, 90)
+    test_size = create_slider('Insert Test Size', 0.1, 0.9)
     
     st.markdown("""
     <style>
@@ -743,9 +774,10 @@ def ChooseModel():
     st.markdown('<div class="custom-label">Choose Models</div>', unsafe_allow_html=True)
     
     model_options = ['Logistic Regression', 'NaiveBayes',
-               'SVM','DecisionTree','RandomForest', 'XGBoost']
+                'DecisionTree','RandomForest', 'XGBoost']
     selected_models = st.selectbox('', model_options)
     training(selected_models, test_size)
+    
 
 
     
@@ -756,8 +788,58 @@ def evaluation():
         st.subheader('No model has been trained')
         st.subheader('Please choose the given models in Model Page')
         return
-    st.session_state.Model
-
+    set_background('B1AFFF')
+    
+    st.subheader('Model evaluation criteria')
+    st.image('eval.png')
+    space()
+    from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, confusion_matrix, ConfusionMatrixDisplay
+    from sklearn.model_selection import cross_val_score
+    pred = st.session_state.Model.predict(st.session_state.test)
+    tries = st.session_state.Model.predict(st.session_state.train)
+    st.subheader('Model Evaluation')
+    st.write(f'Accuracy score: {accuracy_score(pred, st.session_state.result)*100:.2f}%')
+    st.write(f'F1 score: {f1_score(pred, st.session_state.result)*100:.2f}%')
+    st.write(f'Recall score: {recall_score(pred, st.session_state.result)*100:.2f}%')
+    st.write(f'Precision score: {precision_score(pred, st.session_state.result)*100:.2f}%')
+    st.write(f'Cross Validation Score(10): {(cross_val_score(st.session_state.Model, st.session_state.test, st.session_state.result, cv=10).mean())*100:.2f}%')
+    space()
+    
+    
+    st.header('Model Confusion Matrix')
+    # Training
+    st.subheader('Training Set')
+    cm_train = confusion_matrix(tries, st.session_state.validation)
+    sns.heatmap(cm_train, cmap='Blues', annot=True, fmt='.0f', linecolor='white')
+    plt.title('Confusion Matrix of Training Set', size=15)
+    plt.xlabel('Predicted Labels')
+    plt.ylabel('Actual Labels')
+    st.pyplot()
+    space()
+    
+    # Test set confusion matrix
+    st.subheader('Test Set')
+    cm_test = confusion_matrix(pred, st.session_state.result)
+    sns.heatmap(cm_test, cmap='Blues', annot=True, fmt='.0f', linecolor='white')
+    plt.title('Confusion Matrix of Test Set', size=15)
+    plt.xlabel('Predicted Labels')
+    plt.ylabel('Actual Labels')
+    st.pyplot()
+    space()
+    
+    
+    to_predict = st.session_state.to_predict.values
+    to_predict = st.session_state.ct.transform(to_predict)
+    columns_to_scale = [9, 10, 23]
+    to_predict[:, columns_to_scale] = st.session_state.sc.fit_transform(to_predict[:, columns_to_scale])
+    
+    st.header('Input Prediction')
+    if st.session_state.Model.predict(to_predict):
+        st.success('Customer Satisfied')
+    else:
+        st.error('Customer is not satisfied')
+    #predict.iloc[:, [0, 1, 14]] = st.session_state.sc.transform(predict.iloc[:, [0, 1, 14]])
+    
 
 
 
