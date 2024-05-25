@@ -788,6 +788,11 @@ def evaluation():
         st.subheader('No model has been trained')
         st.subheader('Please choose the given models in Model Page')
         return
+    if st.session_state.to_predict == None:
+        set_background('ff0f0f')
+        st.subheader('No data has been submitted')
+        st.subheader('Please submit data first')
+        return
     set_background('B1AFFF')
     st.set_option('deprecation.showPyplotGlobalUse', False)
     st.subheader('Model evaluation criteria')
