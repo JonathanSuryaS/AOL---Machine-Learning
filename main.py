@@ -789,7 +789,7 @@ def evaluation():
         st.subheader('Please choose the given models in Model Page')
         return
     set_background('B1AFFF')
-    
+    st.set_option('deprecation.showPyplotGlobalUse', False)
     st.subheader('Model evaluation criteria')
     st.image('eval.png')
     space()
