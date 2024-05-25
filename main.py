@@ -12,34 +12,81 @@ from streamlit_option_menu import option_menu
 
 # Global Variables
 data = pd.read_csv('trainPlane.csv')
-CustomerGende= None
-CustomerType = None
-age = None
-TypeTravel = None 
-Class = None
-Distance = None
-inflight_wifi = None
-departure_arrival_time = None
-online_booking = None
-gate_location = None
-food_drink = None
-online_boarding = None
-seat_comfort = None
-inflight_entertainment = None
-onboard_service = None
-legroom_service = None
-baggage_handling = None
-checkin_service = None
-inflight_service = None
-cleanliness = None
+if 'CustomerGende' not in st.session_state:
+    st.session_state.CustomerGende = None
 
-#Model
-Model = None
+if 'CustomerType' not in st.session_state:
+    st.session_state.CustomerType = None
 
-test = None
-result = None
-train = None
-validation = None
+if 'age' not in st.session_state:
+    st.session_state.age = None
+
+if 'TypeTravel' not in st.session_state:
+    st.session_state.TypeTravel = None
+
+if 'Class' not in st.session_state:
+    st.session_state.Class = None
+
+if 'Distance' not in st.session_state:
+    st.session_state.Distance = None
+
+if 'inflight_wifi' not in st.session_state:
+    st.session_state.inflight_wifi = None
+
+if 'departure_arrival_time' not in st.session_state:
+    st.session_state.departure_arrival_time = None
+
+if 'online_booking' not in st.session_state:
+    st.session_state.online_booking = None
+
+if 'gate_location' not in st.session_state:
+    st.session_state.gate_location = None
+
+if 'food_drink' not in st.session_state:
+    st.session_state.food_drink = None
+
+if 'online_boarding' not in st.session_state:
+    st.session_state.online_boarding = None
+
+if 'seat_comfort' not in st.session_state:
+    st.session_state.seat_comfort = None
+
+if 'inflight_entertainment' not in st.session_state:
+    st.session_state.inflight_entertainment = None
+
+if 'onboard_service' not in st.session_state:
+    st.session_state.onboard_service = None
+
+if 'legroom_service' not in st.session_state:
+    st.session_state.legroom_service = None
+
+if 'baggage_handling' not in st.session_state:
+    st.session_state.baggage_handling = None
+
+if 'checkin_service' not in st.session_state:
+    st.session_state.checkin_service = None
+
+if 'inflight_service' not in st.session_state:
+    st.session_state.inflight_service = None
+
+if 'cleanliness' not in st.session_state:
+    st.session_state.cleanliness = None
+
+# Model related session state variables
+if 'Model' not in st.session_state:
+    st.session_state.Model = None
+
+if 'test' not in st.session_state:
+    st.session_state.test = None
+
+if 'result' not in st.session_state:
+    st.session_state.result = None
+
+if 'train' not in st.session_state:
+    st.session_state.train = None
+
+if 'validation' not in st.session_state:
+    st.session_state.validation = None
 
 
 def EDA():
@@ -62,7 +109,7 @@ def EDA():
             <p style='text-align: justify; color: white; font-family: Arial;'>{text}</p>
             """, unsafe_allow_html=True)
 
-    set_background("508CA4")
+    set_background("8EA7E9")
     # Display dashboard content
     st.markdown("""
     <br><h1 style='text-align: left; color: white; font-family: Arial;'>Exploratory Data Analysis (EDA)</h1>
@@ -74,7 +121,7 @@ def EDA():
     st.markdown("""
     <p style='text-align: left; color: white; font-family: Arial;'> The dataset that will be utilized for the Machine Learning Project's implementation.</p>
     """, unsafe_allow_html=True)
-    data
+    st.table(data.head())
 
     # Overview
     st.markdown("""
@@ -89,7 +136,7 @@ def EDA():
     st.markdown("""
     <p style='text-align: left; color: white; font-family: Arial;'>Statistical summary for the dataset.</p>
     """, unsafe_allow_html=True)
-    data.describe().T
+    st.table(data.describe().T)
 
     # TBD
     # pr = ProfileReport(data, explorative=True)
@@ -368,7 +415,7 @@ def EDA():
 
 
 def prediction():
-    set_background('f1e0C5')
+    set_background('AD88C6')
     st.markdown("""
     <br><h1 style='text-align: left; color: white; font-family: Arial;'>Does the customer satisfied with airline service?</h1>
     """, unsafe_allow_html=True)
@@ -495,28 +542,41 @@ def prediction():
     
     space()
     if PredictButton:
-        CustomerGender = TempCustomerGender
-        CustomerType = TempCustomerType
-        age = Tempage
-        TypeTravel = TempTypeTravel
-        Class = TempClass
-        Distance = TempDistance
-        inflight_wifi = Tempinflight_wifi
-        departure_arrival_time = Tempdeparture_arrival_time
-        online_booking = Temponline_booking
-        gate_location = Tempgate_location
-        food_drink = Tempfood_drink
-        online_boarding = Temponline_boarding
-        seat_comfort = Tempseat_comfort
-        inflight_entertainment = Tempinflight_entertainment
-        onboard_service = Temponboard_service
-        legroom_service = Templegroom_service
-        baggage_handling = Tempbaggage_handling
-        checkin_service = Tempcheckin_service
-        inflight_service = Tempinflight_service
-        cleanliness = Tempcleanliness
+        st.session_state.CustomerGender = TempCustomerGender
+        st.session_state.CustomerType = TempCustomerType
+        st.session_state.age = Tempage
+        st.session_state.TypeTravel = TempTypeTravel
+        st.session_state.Class = TempClass
+        st.session_state.Distance = TempDistance
+        st.session_state.inflight_wifi = Tempinflight_wifi
+        st.session_state.departure_arrival_time = Tempdeparture_arrival_time
+        st.session_state.online_booking = Temponline_booking
+        st.session_state.gate_location = Tempgate_location
+        st.session_state.food_drink = Tempfood_drink
+        st.session_state.online_boarding = Temponline_boarding
+        st.session_state.seat_comfort = Tempseat_comfort
+        st.session_state.inflight_entertainment = Tempinflight_entertainment
+        st.session_state.onboard_service = Temponboard_service
+        st.session_state.legroom_service = Templegroom_service
+        st.session_state.baggage_handling = Tempbaggage_handling
+        st.session_state.checkin_service = Tempcheckin_service
+        st.session_state.inflight_service = Tempinflight_service
+        st.session_state.cleanliness = Tempcleanliness
         st.success('Data Submitted, Predict your data!')
 
+def getFeatures():
+    data.drop(columns=['id', 'Unnamed: 0'], inplace=True)
+    data.loc[data['satisfaction'] == 'satisfied', 'satisfaction'] = 1
+    data.loc[data['satisfaction'] == 'neutral or dissatisfied', 'satisfaction'] = 0
+    data['satisfaction'] = data['satisfaction'].astype(int)
+    data.dropna(inplace=True)
+
+    X = data.drop(columns=['satisfaction', 'Cleanliness',
+                      'Departure Delay in Minutes', 'Inflight wifi service'])
+    y = data['satisfaction']
+
+    X = pd.get_dummies(X, drop_first=True)
+    return X,y 
 
 def training(selected, test_size):
     from sklearn.model_selection import train_test_split
@@ -527,10 +587,10 @@ def training(selected, test_size):
     X_train.iloc[:, [0, 1, 14]] = sc.fit_transform(X_train.iloc[:, [0, 1, 14]])
     X_test.iloc[:, [0, 1, 14]] = sc.transform(X_test.iloc[:, [0, 1, 14]])
     global train, validation, test, result
-    train = X_train
-    validation = y_train
-    test = X_test
-    result = y_test
+    st.session_state.train = X_train
+    st.session_state.validation = y_train
+    st.session_state.test = X_test
+    st.session_state.result = y_test
     
     st.markdown("""
     <style>
@@ -594,9 +654,8 @@ def Logistic():
             n_jobs=n_jobs,
             random_state=random_state
         )
-        model.fit(train, validation)
-        global Model
-        Model = model
+        model.fit(st.session_state.train, st.session_state.validation)
+        st.session_state.Model = model
             
     
 def svm():
@@ -630,25 +689,27 @@ def svm():
     break_ties = st.checkbox('Break ties', value=False)
     random_state = st.slider('Random state', 0, 100, 42)
     
-    svc = SVC(
-        C=C,
-        kernel=kernel,
-        degree=degree,
-        gamma=gamma,
-        coef0=coef0,
-        shrinking=shrinking,
-        probability=probability,
-        tol=tol,
-        cache_size=cache_size,
-        class_weight=class_weight,
-        verbose=verbose,
-        max_iter=max_iter,
-        decision_function_shape=decision_function_shape,
-        break_ties=break_ties,
-        random_state=random_state
-    )   
-    global Model
-    Model = svc.fit(train, validation)
+    predict = st.button('Deploy Model')
+    if predict:
+        svc = SVC(
+            C=C,
+            kernel=kernel,
+            degree=degree,
+            gamma=gamma,
+            coef0=coef0,
+            shrinking=shrinking,
+            probability=probability,
+            tol=tol,
+            cache_size=cache_size,
+            class_weight=class_weight,
+            verbose=verbose,
+            max_iter=max_iter,
+            decision_function_shape=decision_function_shape,
+            break_ties=break_ties,
+            random_state=random_state
+        )   
+        svc.fit(st.session_state.train, st.session_state.validation)
+        st.session_state.Model = svc
         
 
 def ChooseModel():
@@ -687,11 +748,15 @@ def ChooseModel():
     training(selected_models, test_size)
 
 
+    
+
 def evaluation():
-    train
-    validation
-    test
-    result
+    if st.session_state.Model == None:
+        set_background('ff0f0f')
+        st.subheader('No model has been trained')
+        st.subheader('Please choose the given models in Model Page')
+        return
+    st.session_state.Model
 
 
 
@@ -707,7 +772,7 @@ def main():
         
         selected = option_menu(
             "Main Menu", 
-            ["Home", "Exploratory Data Analysis", "Input Data", "Choose Model", "Result and Evaluation"], 
+            ["Home", "Exploratory Data Analysis", "Input Data", "Model", "Result and Evaluation"], 
             icons=['house', 'bar-chart', 'upload', 'robot', 'check-circle'], 
             menu_icon="cast", 
             default_index=0
@@ -728,7 +793,7 @@ def main():
         EDA()
     elif selected == "Input Data":
         prediction()
-    elif selected == "Choose Model":
+    elif selected == "Model":
         ChooseModel()
     elif selected == "Result and Evaluation":
         st.title("Result and Evaluation")
@@ -750,35 +815,6 @@ def set_background(color):
 def space():
     st.markdown("""
               <br><br>""", unsafe_allow_html=True)
-
-
-
-container_css = """
-<style>
-.box {
-    background-color: #3f4c6b; /* Box background color */
-    padding: 20px;           /* Box padding */
-    border-radius: 10px;     /* Box rounded corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Box shadow */
-    margin-bottom: 20px;     /* Bottom margin for spacing */
-}
-</style>
-"""
-
-
-def getFeatures():
-    data.drop(columns=['id', 'Unnamed: 0'], inplace=True)
-    data.loc[data['satisfaction'] == 'satisfied', 'satisfaction'] = 1
-    data.loc[data['satisfaction'] == 'neutral or dissatisfied', 'satisfaction'] = 0
-    data['satisfaction'] = data['satisfaction'].astype(int)
-    data.dropna(inplace=True)
-
-    X = data.drop(columns=['satisfaction', 'Cleanliness',
-                      'Departure Delay in Minutes', 'Inflight wifi service'])
-    y = data['satisfaction']
-
-    X = pd.get_dummies(X, drop_first=True)
-    return X,y 
 
 
 data = pd.read_csv('trainPlane.csv')
