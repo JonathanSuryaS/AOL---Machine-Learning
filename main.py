@@ -47,16 +47,16 @@ def EDA():
     set_background("8EA7E9")
     # Display dashboard content
     st.markdown("""
-    <br><h1 style='text-align: left; color: white; font-family: Arial;'>Exploratory Data Analysis (EDA)</h1>
+    <br><h1 style='text-align: left; color: black; font-family: Arial;'>Exploratory Data Analysis (EDA)</h1>
     """, unsafe_allow_html=True)
     # Data
     st.markdown("""
-    <h2 style='text-align: left; color: white; font-family: Arial;'>Dataset</h2>
+    <h2 style='text-align: left; color: black; font-family: Arial;'>Dataset</h2>
     """, unsafe_allow_html=True)
     st.markdown("""
-    <p style='text-align: left; color: white; font-family: Arial;'> The dataset that will be utilized for the Machine Learning Project's implementation.</p>
+    <p style='text-align: left; color: black; font-family: Arial;'> The dataset that will be utilized for the Machine Learning Project's implementation.</p>
     """, unsafe_allow_html=True)
-    st.table(data.head())
+    st.write(data.head())
 
     # Statistical Summary
     summary = st.checkbox('Statistical summary data', value=False)
@@ -79,7 +79,7 @@ def EDA():
     #Target distribution
     space()
     st.markdown("""
-    <h2 style='text-align: left; color: white; font-family: Arial;'>Satisfaction distribution</h2>
+    <h2 style='text-align: left; color: black; font-family: Arial;'>Satisfaction distribution</h2>
     """, unsafe_allow_html=True)
     fig, ax = plt.subplots(1, 2, figsize=(18, 8))
     data['satisfaction'].value_counts().plot(
@@ -98,7 +98,7 @@ def EDA():
     #Relationship Between Variables
     space()
     st.markdown("""
-    <h2 style='text-align: left; color: white; font-family: Arial;'>Relationship Between Variables</h2>
+    <h2 style='text-align: left; color: black; font-family: Arial;'>Relationship Between Variables</h2>
     """, unsafe_allow_html=True)
     st.subheader('Customer data')
     data_options = ['Categorical data','Numerical data']
@@ -248,9 +248,9 @@ def EDA2():
 
 
 def prediction():
-    set_background('AD88C6')
+    set_background('FBA834')
     st.markdown("""
-    <br><h1 style='text-align: left; color: white; font-family: Arial;'>Does the customer satisfied with airline service?</h1>
+    <br><h1 style='text-align: left; color: black; font-family: Arial;'>Does the customer satisfied with airline service?</h1>
     """, unsafe_allow_html=True)
     st.image('satisfied.jpg')
 
@@ -680,65 +680,61 @@ def evaluation():
         st.subheader('Please choose the given models in Model page')
         return
     
+    
+    set_background('B1AFFF')
+    st.set_option('deprecation.showPyplotGlobalUse', False)
+    st.subheader('Model evaluation criteria')
+    st.image('eval.png')
+    space()
+    from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, confusion_matrix, ConfusionMatrixDisplay
+    from sklearn.model_selection import cross_val_score
+    pred = st.session_state.Model.predict(st.session_state.test)
+    tries = st.session_state.Model.predict(st.session_state.train)
+    st.subheader('Model Evaluation')
+    st.write(f'Accuracy score: {accuracy_score(pred, st.session_state.result)*100:.2f}%')
+    st.write(f'F1 score: {f1_score(pred, st.session_state.result)*100:.2f}%')
+    st.write(f'Recall score: {recall_score(pred, st.session_state.result)*100:.2f}%')
+    st.write(f'Precision score: {precision_score(pred, st.session_state.result)*100:.2f}%')
+    st.write(f'Cross Validation Score(10): {(cross_val_score(st.session_state.Model, st.session_state.test, st.session_state.result, cv=10).mean())*100:.2f}%')
+    space()
+    st.header('Model Confusion Matrix')
+    # Training
+    st.subheader('Training Set')
+    cm_train = confusion_matrix(tries, st.session_state.validation)
+    sns.heatmap(cm_train, cmap='Blues', annot=True, fmt='.0f', linecolor='white')
+    plt.title('Confusion Matrix of Training Set', size=15)
+    plt.xlabel('Predicted Labels')
+    plt.ylabel('Actual Labels')
+    st.pyplot()
+    space()
+    # Test set confusion matrix
+    st.subheader('Test Set')
+    cm_test = confusion_matrix(pred, st.session_state.result)
+    sns.heatmap(cm_test, cmap='Blues', annot=True, fmt='.0f', linecolor='white')
+    plt.title('Confusion Matrix of Test Set', size=15)
+    plt.xlabel('Predicted Labels')
+    plt.ylabel('Actual Labels')
+    st.pyplot()
+    space()
+    
+    
+
+def result():
     if st.session_state.to_predict is not None:
-        set_background('B1AFFF')
-        st.set_option('deprecation.showPyplotGlobalUse', False)
-        st.subheader('Model evaluation criteria')
-        st.image('eval.png')
-        space()
-        from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, confusion_matrix, ConfusionMatrixDisplay
-        from sklearn.model_selection import cross_val_score
-        pred = st.session_state.Model.predict(st.session_state.test)
-        tries = st.session_state.Model.predict(st.session_state.train)
-        st.subheader('Model Evaluation')
-        st.write(f'Accuracy score: {accuracy_score(pred, st.session_state.result)*100:.2f}%')
-        st.write(f'F1 score: {f1_score(pred, st.session_state.result)*100:.2f}%')
-        st.write(f'Recall score: {recall_score(pred, st.session_state.result)*100:.2f}%')
-        st.write(f'Precision score: {precision_score(pred, st.session_state.result)*100:.2f}%')
-        st.write(f'Cross Validation Score(10): {(cross_val_score(st.session_state.Model, st.session_state.test, st.session_state.result, cv=10).mean())*100:.2f}%')
-        space()
-
-
-        st.header('Model Confusion Matrix')
-        # Training
-        st.subheader('Training Set')
-        cm_train = confusion_matrix(tries, st.session_state.validation)
-        sns.heatmap(cm_train, cmap='Blues', annot=True, fmt='.0f', linecolor='white')
-        plt.title('Confusion Matrix of Training Set', size=15)
-        plt.xlabel('Predicted Labels')
-        plt.ylabel('Actual Labels')
-        st.pyplot()
-        space()
-
-        # Test set confusion matrix
-        st.subheader('Test Set')
-        cm_test = confusion_matrix(pred, st.session_state.result)
-        sns.heatmap(cm_test, cmap='Blues', annot=True, fmt='.0f', linecolor='white')
-        plt.title('Confusion Matrix of Test Set', size=15)
-        plt.xlabel('Predicted Labels')
-        plt.ylabel('Actual Labels')
-        st.pyplot()
-        space()
-
-
+        st.header('Input Prediction')
         to_predict = st.session_state.to_predict.values
         to_predict = st.session_state.ct.transform(to_predict)
         columns_to_scale = [9, 10, 23]
         to_predict[:, columns_to_scale] = st.session_state.sc.fit_transform(to_predict[:, columns_to_scale])
-
-        st.header('Input Prediction')
         if st.session_state.Model.predict(to_predict):
             st.success('Customer Satisfied')
         else:
             st.error('Customer is not satisfied')
         #predict.iloc[:, [0, 1, 14]] = st.session_state.sc.transform(predict.iloc[:, [0, 1, 14]])
-    
     else:
         set_background('ff0f0f')
         st.subheader('No data has been submitted')
         st.subheader('Please insert data in Input Data page')
-    
-
 
 
 def main():
@@ -752,8 +748,8 @@ def main():
         
         selected = option_menu(
             "Main Menu", 
-            ["Home", "Exploratory Data Analysis", "Input Data", "Model", "Result and Evaluation"], 
-            icons=['house', 'bar-chart', 'upload', 'robot', 'check-circle'], 
+            ["Home", "Exploratory Data Analysis", "Input Data", "Model", "Evaluation", "Result"], 
+            icons = ['house', 'bar-chart', 'upload', 'robot', 'check-circle', 'trophy'], 
             menu_icon="cast", 
             default_index=0
         )
@@ -775,9 +771,12 @@ def main():
         prediction()
     elif selected == "Model":
         ChooseModel()
-    elif selected == "Result and Evaluation":
-        st.title("Result and Evaluation")
+    elif selected == "Evaluation":
+        st.title("Evaluation")
         evaluation()
+    elif selected == 'Result':
+        st.title('Result')
+        result()
 
 
 def set_background(color):
