@@ -504,6 +504,7 @@ def DecisionTree():
         )
         model.fit(st.session_state.train, st.session_state.validation)
         st.session_state.Model = model
+        st.success('Model Created, please check Result and Evaluation')
 
 def RandomForest():
     from sklearn.ensemble import RandomForestClassifier
@@ -537,6 +538,7 @@ def RandomForest():
         )
         model.fit(st.session_state.train, st.session_state.validation)
         st.session_state.Model = model
+        st.success('Model Created, please check Result and Evaluation')
 
 def NaiveBayes():
     from sklearn.naive_bayes import GaussianNB
@@ -549,6 +551,7 @@ def NaiveBayes():
         model = GaussianNB()
         model.fit(st.session_state.train, st.session_state.validation)
         st.session_state.Model = model
+        st.success('Model Created, please check Result and Evaluation')
 
 def XGBoost():
     from xgboost import XGBClassifier
@@ -579,6 +582,7 @@ def XGBoost():
         )
         model.fit(st.session_state.train, st.session_state.validation)
         st.session_state.Model = model
+        st.success('Model Created, please check Result and Evaluation')
 
 
 # def svm():
@@ -686,11 +690,29 @@ def evaluation():
     st.subheader('Model evaluation criteria')
     st.image('eval.png')
     space()
-    from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, confusion_matrix, ConfusionMatrixDisplay
+    from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, confusion_matrix, ConfusionMatrixDisplay, classification_report
     from sklearn.model_selection import cross_val_score
     pred = st.session_state.Model.predict(st.session_state.test)
     tries = st.session_state.Model.predict(st.session_state.train)
-    st.subheader('Model Evaluation')
+
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.naive_bayes import GaussianNB
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.tree import DecisionTreeClassifier
+    from xgboost import XGBClassifier
+    
+    if isinstance(st.session_state.Model, LogisticRegression):
+        st.subheader('Model Evaluation: Logistic Regression')
+    elif isinstance(st.session_state.Model, GaussianNB):
+        st.subheader('Model Evaluation: Naive Bayes Classifier')
+    elif isinstance(st.session_state.Model, RandomForestClassifier):
+        st.subheader('Model Evaluation: Random Forest Classifier')
+    elif isinstance(st.session_state.Model, DecisionTreeClassifier):
+        st.subheader('Model Evaluation: Decision Tree Classifier')
+    elif isinstance(st.session_state.Model, XGBClassifier):
+        st.subheader('Model Evaluation: XGBoost Classifier')
+    
+    #rep = classification_report(pred, st.session_state.result)
     st.write(f'Accuracy score: {accuracy_score(pred, st.session_state.result)*100:.2f}%')
     st.write(f'F1 score: {f1_score(pred, st.session_state.result)*100:.2f}%')
     st.write(f'Recall score: {recall_score(pred, st.session_state.result)*100:.2f}%')
@@ -716,6 +738,11 @@ def evaluation():
     plt.ylabel('Actual Labels')
     st.pyplot()
     space()
+
+    #Curve
+    from mlxtend.plotting import decision_regions
+    plots = decision_regions(st.session_state.train, st.session_state.validation, clf = st.session_state.Model)
+    st.pyplot(plots)
     
     
 
