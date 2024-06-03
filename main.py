@@ -10,6 +10,12 @@ from streamlit_pandas_profiling import st_profile_report
 import pickle
 # from pandas_profiling import ProfileReport
 from streamlit_option_menu import option_menu
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
+from xgboost import XGBClassifier
+import plotly.express as px
 
 
 # Global Variables
@@ -640,9 +646,9 @@ def XGBoost():
         
 
 def ChooseModel():
-    set_background('135D66')
+    set_background('FAF2D3')
     st.markdown("""
-    <br><h1 style='text-align: left; color: white; font-family: Arial;'>Model for Classification</h1>
+    <br><h1 style='text-align: left; color: black; font-family: Arial;'>Model for Classification</h1>
     """, unsafe_allow_html=True)
     
     
@@ -694,6 +700,7 @@ def evaluation():
     from sklearn.model_selection import cross_val_score
     pred = st.session_state.Model.predict(st.session_state.test)
     tries = st.session_state.Model.predict(st.session_state.train)
+    st.session_state.Pred = pred
 
     from sklearn.linear_model import LogisticRegression
     from sklearn.naive_bayes import GaussianNB
@@ -722,8 +729,9 @@ def evaluation():
     st.header('Model Confusion Matrix')
     # Training
     st.subheader('Training Set')
+    labels = ['neutral or dissatisfied', 'satisfied']
     cm_train = confusion_matrix(tries, st.session_state.validation)
-    sns.heatmap(cm_train, cmap='Blues', annot=True, fmt='.0f', linecolor='white')
+    sns.heatmap(cm_train, cmap='Blues', annot=True, fmt='.0f', linecolor='white',xticklabels=labels, yticklabels=labels)
     plt.title('Confusion Matrix of Training Set', size=15)
     plt.xlabel('Predicted Labels')
     plt.ylabel('Actual Labels')
@@ -732,23 +740,56 @@ def evaluation():
     # Test set confusion matrix
     st.subheader('Test Set')
     cm_test = confusion_matrix(pred, st.session_state.result)
-    sns.heatmap(cm_test, cmap='Blues', annot=True, fmt='.0f', linecolor='white')
+    sns.heatmap(cm_test, cmap='Blues', annot=True, fmt='.0f', linecolor='white',xticklabels=labels, yticklabels=labels)
     plt.title('Confusion Matrix of Test Set', size=15)
     plt.xlabel('Predicted Labels')
     plt.ylabel('Actual Labels')
     st.pyplot()
     space()
 
-    #Curve
-    from mlxtend.plotting import decision_regions
-    plots = decision_regions(st.session_state.train, st.session_state.validation, clf = st.session_state.Model)
-    st.pyplot(plots)
-    
     
 
 def result():
+    if st.session_state.Model == None:
+        set_background('ff0f0f')
+        st.subheader('No model has been trained')
+        st.subheader('Please choose the given models in Model page')
+        return
     if st.session_state.to_predict is not None:
         st.header('Input Prediction')
+
+        #PCA
+        from sklearn.decomposition import PCA
+        pca = PCA(n_components=3)
+        X_pca = pca.fit_transform(st.session_state.test)
+        y = st.session_state.Pred
+        plt.figure(figsize=(8, 6))
+        color_map = {0: 'red', 1: 'blue'}
+
+        # Define custom labels for the legend
+        labels = {0: 'neutral or dissatisfied', 1: 'satisfied'}
+
+        # Create the 3D scatter plot
+        fig = px.scatter_3d(x=X_pca[:, 0], y=X_pca[:, 1], z=X_pca[:, 2], color=y,
+                            color_discrete_map=color_map, labels={'color': 'Labels'}, color_continuous_scale=list(color_map.values()))
+
+        # Update legend title
+        fig.update_layout(coloraxis_colorbar=dict(title='Labels'))
+
+    
+        
+        # Plot the data points
+        fig.update_traces(marker=dict(size=5))
+        
+        # Add title and labels
+        fig.update_layout(title="Decision Boundary in 3D", 
+                          scene=dict(xaxis_title='Principal Component 1',
+                                     yaxis_title='Principal Component 2',
+                                     zaxis_title='Principal Component 3'))
+        
+        # Show the figure
+        st.plotly_chart(fig)
+
         to_predict = st.session_state.to_predict.values
         to_predict = st.session_state.ct.transform(to_predict)
         columns_to_scale = [9, 10, 23]
