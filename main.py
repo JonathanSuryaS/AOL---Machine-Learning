@@ -54,26 +54,41 @@ def homepage():
     set_background('EEEEEE')
     st.title('Customer Airline Satisfaction')
     st.image('Airline-satisfaction-cover-1.png')
-    st.write("""
+    st.markdown(
+                    """
+                    <div style='text-align: justify;'>
         The Airlines Customer Satisfaction contains data about customer feedback and flight details for passenger who have flown with specific airlines service. These datas is structured and analyzed to predict customer satisfaction based on multiple parameters such as the customer data itself, and the airlines.
-    """)
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
 
     space()
     col1, col2 = st.columns(2)
 
     with col1:
         st.subheader('Customer data')
-        st.image('customer.jpeg')
+        customer = Image.open('customer.jpeg')
+        customer = customer.resize((400, 300))
+        st.image(customer)
     with col2:
         space()
-        st.write("""
-            Customer data contains various type of information about customer that can be used for analysis, prediction, and improving business strategies such as airlines service. Customer data contains both categorical and numerical which can be seen below. These various feature can be analyzed to gain useful insight which can lead to improved marketing strategies and customer experience itself during flight.
-        """)
+        st.markdown(
+            """
+            <div style='text-align: justify;'>
+            Customer data contains various type of information about customer that can be used for analysis, prediction, 
+            and improving business strategies such as airlines service. Customer data contains both categorical and numerical 
+            which can be seen below. These various feature can be analyzed to gain useful insight which can lead to improved 
+            marketing strategies and customer experience itself during flight.
+            </div>
+            """, 
+            unsafe_allow_html=True
+         )
     space()
-    custdata = create_radio_input('Choose category', ['Category', 'Numerical'])
+    custdata = create_radio_input('Choose customer data category', ['Category', 'Numerical'])
 
     if custdata == 'Category':
-        custcat = ['Gender', 'Customer Type', 'Type of Travel', 'Class']
+        custcat = ['Gender', 'Customer Type', 'Type of Travel', 'Class', 'Satisfied or Dissatisfied']
         catdata = st.selectbox('Select data', custcat)
         if catdata == 'Gender':
             coltype1, coltype2 = st.columns(2)
@@ -83,7 +98,18 @@ def homepage():
             with coltype2:
                 space()
                 st.write('\n')
-                st.write('''Customer Gender contain data about the gender of customer. This data can be used to analyze the pattern of customer and their preference, specifically between male and female customer as airlines passenger. By analyzing it alongside other relevant data points, businesses can gain insights that lead to improved marketing strategies, targeted product development, and a more personalized customer experience.''')
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    Customer Gender contain data about the gender of customer.
+                    This data can be used to analyze the pattern of customer and their preference, specifically between male and 
+                    female customer as airlines passenger. By analyzing it alongside other relevant data points, businesses can gain 
+                    insights that lead to improved
+                    marketing strategies, targeted product development, and a more personalized customer experience.'
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
             space()
         elif catdata == 'Customer Type':
             coltype1, coltype2 = st.columns(2)
@@ -93,7 +119,16 @@ def homepage():
             with coltype2:
                 space()
                 st.write('\n')
-                st.write('''Customer type is crucial for business, understanding various customer type helps optimize marketing strategies, improve customer satisfaction, and could potentially increase loyalty. Customer type is divided by two categories, namely Loyal Customer and Disloyal Customer''')
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    Customer type is crucial for business, understanding various customer 
+                    type helps optimize marketing strategies, improve customer satisfaction, and could potentially increase loyalty. 
+                    Customer type is divided by two categories, namely Loyal Customer and Disloyal Customer
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
             space()
             typ1,typ2 = st.columns(2)
             with typ2:
@@ -117,22 +152,43 @@ def homepage():
             with coltype2:
                 space()
                 st.write('\n')
-                st.write('''This data is about the type of travel customer had during flight. Type of travel is categorized into two categorical, Business Travel and Personal Travel. Type of Travel can be used to analyze which customer is easier to satisfy based on type of travel they had.''')
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    This data is about the type of travel customer had during flight. Type of travel is categorized into two categorical, Business Travel and Personal Travel. Type of Travel can be used to analyze which customer is easier to satisfy based on type of travel they had.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
             space()
             typ1,typ2 = st.columns(2)
             with typ2:
                 disimage = Image.open('personal.webp')
-                disimage = disimage.resize((310, 200))
+                disimage = disimage.resize((350, 205))
                 st.subheader('Personal Travel')
                 st.image(disimage)
-                st.write('''In contrast, personal travel refers to trips embarked upon for non-business-related reasons, such as vacations, family visits, leisure outings, or special occasions like weddings or holidays. Personal travelers seek experiences tailored to their recreational, cultural, or social interests, with preferences ranging from budget-friendly options to luxury accommodations.''')
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    In contrast, personal travel refers to trips embarked upon for non-business-related reasons, such as vacations, family visits, leisure outings, or special occasions like weddings or holidays. Personal travelers seek experiences tailored to their recreational, cultural, or social interests, with preferences ranging from budget-friendly options to luxury accommodations.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
             
             with typ1:
                 loyalimage = Image.open('business.webp')
-                loyalimage = loyalimage.resize((320, 200))
+                loyalimage = loyalimage.resize((350, 205))
                 st.subheader('Business Travel')
                 st.image(loyalimage)
-                st.write('''This category comprises journeys undertaken for professional purposes, including corporate meetings, conferences, client visits, and work-related training or events. Business travelers prioritize factors such as schedule flexibility, proximity to business destinations, and amenities conducive to productivity during transit.''')
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    This category comprises journeys undertaken for professional purposes, including corporate meetings, conferences, client visits, and work-related training or events. Business travelers prioritize factors such as schedule flexibility, proximity to business destinations, and amenities conducive to productivity during transit.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
 
         elif catdata == 'Class':
             coltype1, coltype2 = st.columns(2)
@@ -142,7 +198,14 @@ def homepage():
             with coltype2:
                 space()
                 st.write('\n')
-                st.write('''Airlines Cabin (Classes) holds information about cabin in airlines service. These cabin aree categorized into three classes namely Business Class, Economy Plus, and Economy. With this data, we can analyze which customer is easier to satisfied given their classes.''')
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    Airlines Cabin (Classes) holds information about cabin in airlines service. These cabin aree categorized into three classes namely Business Class, Economy Plus, and Economy. With this data, we can analyze which customer is easier to satisfied given their classes.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
             space()
             typ1,typ2,typ3 = st.columns(3)
             with typ1:
@@ -150,29 +213,448 @@ def homepage():
                 business = business.resize((310, 200))
                 st.subheader('Business Class')
                 st.image(business)
-                st.write('''This category represents passengers who flew in business class. Business class typically offers more spacious seating, enhanced amenities, and a higher level of service compared to both economy class.''')
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    This category represents passengers who flew in business class. Business class typically offers more spacious seating, enhanced amenities, and a higher level of service compared to both economy class.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
+
             
             with typ2:
                 ecoplus = Image.open('ecoplus.png')
                 ecoplus = ecoplus.resize((320, 200))
                 st.subheader('Economy+ Class')
                 st.image(ecoplus)
-                st.write('''This category represents passengers who flew in economy plus class. Economy Plus is a class of service offered by some airlines that provides some additional benefits over economy class, such as extra legroom or wider seats.''')
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    This category represents passengers who flew in economy plus class. Economy Plus is a class of service offered by some airlines that provides some additional benefits over economy class, such as extra legroom or wider seats.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
+
             
             with typ3:
                 eco = Image.open('economy.webp')
                 eco = eco.resize((320, 200))
                 st.subheader('Economy Class')
                 st.image(eco)
-                st.write('''This category represents passengers who flew in economy class. Economy class is the most basic and affordable class of service offered by airlines.''')
-
-    else:
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    This category represents passengers who flew in economy class. Economy class is the most basic and affordable class of service offered by airlines.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
+        
+        elif catdata == 'Satisfied or Dissatisfied':
+            coltype1, coltype2 = st.columns(2)
+            with coltype1:
+                st.header('Customer Satisfaction')
+                satisfaction = Image.open('satisfaction.jpg')
+                satisfaction = satisfaction.resize((400, 260))
+                st.image(satisfaction)
+            with coltype2:
+                space()
+                st.write('\n')
+                st.write('''Customer satisfaction provide detailed overview of passenger airlines in terms of experience and 
+                         satisfaction levels, encapsulating various aspect by both customer data such as age, airliness class and the 
+                         airline data itself, arrival delay, airlines service, etc. Customer Satisfaction indicates whether passengers were satisfied
+                         or dissatisfied with their airlines experience.''')
+            space()
+            typ1,typ2 = st.columns(2)
+            with typ2:
+                disimage = Image.open('waduh.png')
+                disimage = disimage.resize((310, 200))
+                st.subheader('Dissatisfied Customer')
+                st.image(disimage)
+                st.write('''This category comprises passengers who had a negative travel experience, as reflected in their feedback and lower ratings. Common issues leading to dissatisfaction include flight delays or cancellations, uncomfortable seating, unprofessional or unhelpful staff, poor in-flight services, and inadequate handling of complaints or issues. Dissatisfied customers may express their discontent through negative reviews and are less likely to choose the airline for future travel.''')
+            
+            with typ1:
+                loyalimage = Image.open('satisfiedcust.jpg')
+                loyalimage = loyalimage.resize((320, 200))
+                st.subheader('Satisfied Customer')
+                st.image(loyalimage)
+                st.write('''This category includes passengers who had a positive travel experience, expressed through favorable feedback and high ratings. Indicators of satisfaction might include on-time departures and arrivals, comfortable seating, courteous staff, efficient check-in processes, in-flight amenities, and overall value for money. Satisfied customers are likely to recommend the airline to others and exhibit higher levels of brand loyalty.''')
+            
+    elif custdata == 'Numerical':
         custnum = ['Age', 'Flight Distance']
         custnum = st.selectbox('Select data', custnum)
+        if custnum == 'Age':
+            coltype1, coltype2 = st.columns(2)
+            with coltype1:
+                st.header('Customer Age')
+                satisfaction = Image.open('aging.webp')
+                satisfaction = satisfaction.resize((400, 260))
+                st.image(satisfaction)
+            with coltype2:
+                space()
+                st.write('\n')
+                st.write('''Customer age provides information about age of passengers in airlines. This data is essential for understanding 
+                         the age distribution of travelers and gain insight from this data. This can be used to improve marketing strategies. and
+                         in-flight amenities to better serve their diverse customer which helps designing appropriate service, improving customer satisfaction.''')
+        
+        elif custnum == 'Flight Distance':
+            coltype1, coltype2 = st.columns(2)
+            with coltype1:
+                st.subheader('Flight Distance')
+                satisfaction = Image.open('distance.webp')
+                satisfaction = satisfaction.resize((400, 280))
+                st.image(satisfaction)
+            with coltype2:
+                space()
+                st.write('''Flight distance provides information on the distance traveled for each flight. This data is essential for analyzing patterns, understanding
+                         the behaviour of customer for various flight distance, enabling monitor and  analysis between customer satisfaction and flight distance. By laveraging
+                        these insight, airlines can implement targeted enhancement, refine service delivery which leads to improve
+                        customer satisfaction.''')
 
+    space()
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("<h2 style='text-align: left;'>Airlines data</h2>", unsafe_allow_html=True)
+        customer = Image.open('service2.jpg')
+        customer = customer.resize((400, 370))
+        st.image(customer)
+    with col2:
+        space()
+        st.write('\n')
+        st.markdown(
+            """
+            <div style='text-align: justify;'>
+            Airlines data provides a comprehensive overview of various aspect of air travel, capturing key details such as airlines service, which
+            essential for understanding and improving passenger experiences. These indicators include cleanliness, fod and drinks, gate location, arrival
+            and departure delay, etc. By analyzing these service quality, airlines can gain valuable insight into their operational strenghts and areas needing
+            improvement by leveraging detailed feedback and performance metric, which leads improving customer satisfaction level.
+            </div>
+            """, 
+            unsafe_allow_html=True
+        )
+    space()
+    airlinedata = create_radio_input('Choose airline data category', ['Category', 'Numerical'])
+    if airlinedata == 'Category':
+        plane_cat = ['Inflight wifi service', 'Departure/Arrival time convenient', 'Ease of Online booking',
+                     'Gate location', 'Food and drink', 'Online boarding', 'Seat comfort', 'Inflight entertainment',
+                     'On-board service', 'Leg room service', 'Baggage handling', 'Check-in service', 'Inflight service',
+                     'Cleanliness']
+        airlinecat = st.selectbox('Select data', plane_cat)
+        st.write('\n\n')
+        if airlinecat == 'Inflight wifi service':
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("<h2 style='text-align: left;'>Inflight Wifi</h2>", unsafe_allow_html=True)
+                customer = Image.open('wifi.jpg')
+                customer = customer.resize((400, 250))
+                st.image(customer)
+            with col2:
+                space()
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    This data provides passenger feedback regarding the availability and quality of Wifi services provided during the flight.
+                    This includes connection speed, reliability, and ease of access. In Flight Wifi has become an essential service for many travelers 
+                    who wish to stay connected during their journey.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
+
+        elif airlinecat == 'Departure/Arrival time convenient':
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("<h2 style='text-align: left;'>Departure / Arrival time convenient</h2>", unsafe_allow_html=True)
+                customer = Image.open('departure.jpg')
+                customer = customer.resize((400, 250))
+                st.image(customer)
+            with col2:
+                space()
+                space()
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    Departure / Arrival time convenient evaluates how convenient passengers find the schedueled departure and arrival times.
+                    It reflects whether flight times align well with passenger's schedueles and preferences, impacting their overall travel experience.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
+        
+        elif airlinecat == 'Ease of Online booking':
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("<h2 style='text-align: left;'>Ease of Online Booking</h2>", unsafe_allow_html=True)
+                customer = Image.open('booking.jpg')
+                customer = customer.resize((400, 250))
+                st.image(customer)
+            with col2:
+                space()
+                space()
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    This data measures the user - friendliness and efficiency of airline's online booking system. It includes aspect such as website or
+                    app interface, speed of booking, availability of necesseary information, and simplicity of booking process.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
+
+        elif airlinecat == 'Gate location':
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("<h2 style='text-align: left;'>Gate Location</h2>", unsafe_allow_html=True)
+                customer = Image.open('gate.webp')
+                customer = customer.resize((400, 250))
+                st.image(customer)
+            with col2:
+                space()
+             
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    Gate Location assesses the convenience of the gate location within airport. It considers the distance from security checkpoints,
+                    ease of access, and clear signage, which can significantly affect passenger overall experience.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
+
+        elif airlinecat == 'Food and drink':
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("<h2 style='text-align: left;'>Food and Drink</h2>", unsafe_allow_html=True)
+                customer = Image.open('fb.jpg')
+                customer = customer.resize((400, 250))
+                st.image(customer)
+            with col2:
+                space()
+         
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    Food and drink captures ratings on the quality, variety, and availability of food and beverages offered during the flight.
+                    Good quality meals and drinks are important for passenger comfort, especially on long - haul flights.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
+        
+        elif airlinecat == 'Online boarding':
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("<h2 style='text-align: left;'>Online Boarding</h2>", unsafe_allow_html=True)
+                customer = Image.open('boarding.webp')
+                customer = customer.resize((400, 250))
+                st.image(customer)
+            with col2:
+                space()
+
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    This data reflects on the efficiency and effectiveness of the online boarding process, including mobile or web - based check - in 
+                    options. It assesses how smoothly passengers can obtain boarding passes and manage their boarding process online.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
+
+        elif airlinecat == 'Seat comfort':
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("<h2 style='text-align: left;'>Seat Comfort</h2>", unsafe_allow_html=True)
+                customer = Image.open('seat.webp')
+                customer = customer.resize((400, 250))
+                st.image(customer)
+            with col2:
+                space()
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    Seat comfort measures passengers satisfaction with the comfort of the airline seats. It includes several factors such as legroom,
+                    seat width, recline capability, and overall seating ergonomics, which are crucial for pleasant flight experience that affect
+                    customer satisfaction.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
+
+        elif airlinecat == 'Inflight entertainment':
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("<h2 style='text-align: left;'>Inflight Entertainment</h2>", unsafe_allow_html=True)
+                customer = Image.open('entertainment.jpg')
+                customer = customer.resize((400, 250))
+                st.image(customer)
+            with col2:
+                space()
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    Inflight entertainment evaluates the availability, quality, and variety of entertainment options provided during the flight. 
+                    It includes movies, TV shows, music, 
+                    games, and other multimedia options that help keep passengers engaged and entertained.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
+
+        elif airlinecat == 'On-board service':
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("<h2 style='text-align: left;'>On-board service</h2>", unsafe_allow_html=True)
+                customer = Image.open('boardservices.webp')
+                customer = customer.resize((400, 250))
+                st.image(customer)
+            with col2:
+                space()
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    This feature captures the overall quality of service provided by the cabin crew. It includes aspects such as attentiveness, professionalism, friendliness, and the ability to address passenger needs effectively.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
+
+        elif airlinecat == 'Leg room service':
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("<h2 style='text-align: left;'>Leg room service</h2>", unsafe_allow_html=True)
+                customer = Image.open('leg.jpg')
+                customer = customer.resize((400, 250))
+                st.image(customer)
+            with col2:
+                space()
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    Leg room service assesses the amount of space available for passengers to stretch their legs during flight.
+                    Adequate legroom is critical for factor comfort, especially on longer flights, which affect customer satisfacton.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
+
+        elif airlinecat == 'Baggage handling':
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("<h2 style='text-align: left;'>Baggage handling</h2>", unsafe_allow_html=True)
+                customer = Image.open('bagage.jpg')
+                customer = customer.resize((400, 250))
+                st.image(customer)
+            with col2:
+                space()
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    Baggage handling measures the efficiency and reliability of the airline's baggage handling process.
+                    Baggage handling includes several factor such as the speed of baggage delivery, accuracy, and the handling of lost
+                    or damaged baggage.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
+
+        elif airlinecat == 'Check-in service':
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("<h2 style='text-align: left;'>Check - in Service</h2>", unsafe_allow_html=True)
+                customer = Image.open('checkin.webp')
+                customer = customer.resize((400, 250))
+                st.image(customer)
+            with col2:
+                space()
+                #st.write('\n')
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    This feature evaluates the efficiency and convenience of the check-in process, whether at the airport counter or through self-service kiosks. It includes the speed of service, ease of check-in, and staff assistance.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
+
+        elif airlinecat == 'Inflight service':
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("<h2 style='text-align: left;'>Inflight Service</h2>", unsafe_allow_html=True)
+                customer = Image.open('inflight.jpeg')
+                customer = customer.resize((400, 250))
+                st.image(customer)
+            with col2:
+                space()
+
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    Inflight service assesses the overall quality of services provided during the flight, including responsiveness to passenger requests, availability of necessary amenities, and the overall experience provided by the flight crew.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
+        
+        elif airlinecat == 'Cleanliness':
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("<h2 style='text-align: left;'>Cleanliness</h2>", unsafe_allow_html=True)
+                customer = Image.open('clean.jpg')
+                customer = customer.resize((400, 250))
+                st.image(customer)
+            with col2:
+                space()
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    Cleanliness captures passenger feedback on the cleanliness of the aircraft, including the cabin, seats, restrooms, and common areas. High standards of cleanliness are essential for passenger comfort and health.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
     
-
-
+    elif airlinedata == 'Numerical':
+        plane_num = ['Departure Delay in Minutes', 'Arrival Delay in Minutes']
+        numerical_plane = st.selectbox('Select data', plane_num)
+        
+        if numerical_plane == 'Arrival Delay in Minutes':
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("<h2 style='text-align: left;'>Arrival Delay</h2>", unsafe_allow_html=True)
+                customer = Image.open('arrival.jpg')
+                customer = customer.resize((400, 250))
+                st.image(customer)
+            with col2:
+                space()
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    Arrival Delay quantifies the delay in minutes experienced by a flight upon arrival at its destination airport. Arrival delays can result from factors similar to departure delays, as well as air traffic congestion, runway availability, or airspace restrictions. Analyzing arrival delays allows airlines to evaluate overall flight performance and assess the impact on passenger satisfaction and onward travel connections.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
+        elif numerical_plane == 'Departure Delay in Minutes':
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("<h2 style='text-align: left;'>Departure Delay</h2>", unsafe_allow_html=True)
+                customer = Image.open('departure.webp')
+                customer = customer.resize((400, 250))
+                st.image(customer)
+            with col2:
+                space()
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    Departure Delay measures the amount of delay in minutes experienced by a flight at the departure gate. Departure delays can occur due to various factors such as late arrival of the aircraft, aircraft maintenance issues, crew scheduling issues, or adverse weather conditions. Understanding departure delays helps airlines assess punctuality and operational efficiency.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
+            
 def EDA():
     set_background("8EA7E9")
     # Display dashboard content
@@ -184,7 +666,7 @@ def EDA():
     <h2 style='text-align: left; color: black; font-family: Arial;'>Dataset</h2>
     """, unsafe_allow_html=True)
     st.markdown("""
-    <p style='text-align: left; color: black; font-family: Arial;'> The dataset that will be utilized for the Machine Learning Project's implementation.</p>
+    <p style='text-align: left; color: black; font-family: Arial;'> The dataset that will be utilized for the Machine Learning Prediction implementation.</p>
     """, unsafe_allow_html=True)
     st.write(data.head())
 
@@ -199,12 +681,12 @@ def EDA():
         st.markdown("""
         <p style='text-align: left; color: white; font-family: Arial;'>Statistical summary for the dataset.</p>
         """, unsafe_allow_html=True)
-        st.table(data.describe().T.round(2))
+        st.write(data.describe().T.round(2))
     
     #Data Entry
     entry = st.checkbox('Data Entry', value = False)
     if entry:
-        st.table(data.isnull().sum())
+        st.write(pd.DataFrame(data.isnull().sum(), columns=['NULL entries']))
         
     #Target distribution
     space()
@@ -298,13 +780,13 @@ def EDA():
             st.pyplot(fig)
 
     space()
-    st.subheader('Plane data')
+    st.subheader('Airlines data')
     plane_data = ['Categorical data','Numerical data']
     plane_option = st.radio('Select Plane data types', plane_data)
     if plane_option == 'Categorical data':
         plane_cat = ['Inflight wifi service', 'Departure/Arrival time convenient', 'Ease of Online booking',
                      'Gate location', 'Food and drink', 'Online boarding', 'Seat comfort', 'Inflight entertainment',
-                     'On-board service', 'Leg room service', 'Baggage handling', 'Checking service', 'Inflight service',
+                     'On-board service', 'Leg room service', 'Baggage handling', 'Checkin service', 'Inflight service',
                      'Cleanliness']
         categorical_plane = st.selectbox('Select data', plane_cat)
         if categorical_plane == 'Inflight wifi service':
@@ -329,8 +811,8 @@ def EDA():
             plot_distribution('Leg room service')
         elif categorical_plane == 'Baggage handling':
             plot_distribution('Baggage handling')
-        elif categorical_plane == 'Checking service':
-            plot_distribution('Checking service')
+        elif categorical_plane == 'Checkin service':
+            plot_distribution('Checkin service')
         elif categorical_plane == 'Inflight service':
             plot_distribution('Inflight service')
         elif categorical_plane == 'Cleanliness':
@@ -411,7 +893,7 @@ def create_slider(label, min_value, max_value):
 
 
 def prediction():
-    set_background('FBA834')
+    set_background('FBC687')
     st.markdown("""
     <br><h1 style='text-align: left; color: black; font-family: Arial;'>Does the customer satisfied with airline service?</h1>
     """, unsafe_allow_html=True)
@@ -613,7 +1095,8 @@ def DecisionTree():
     criterion = criterion_map[st.selectbox('Criterion', criterion_options)]
 
     splitter_options = ['best (default)', 'random']
-    splitter = st.selectbox('Splitter', splitter_options, index=0)
+    splitter_map = {'best (default)': 'best', 'random': 'random'}
+    splitter = splitter_map[st.selectbox('Splitter', splitter_options)]
 
     max_depth = st.slider('Max depth (default=None)', 1, 100, 10)
     min_samples_split = st.slider('Min samples split (default=2)', 2, 20, 2)
