@@ -853,9 +853,9 @@ def EDA():
     sns.heatmap(data = numerical.corr(), annot= True, linewidths=0.2, cmap='Blues')
     st.pyplot(fig)
     
-def EDA2():
-    profile = ProfileReport(data, title = 'Report')
-    st_profile_report(profile)
+# def EDA2():
+#     profile = ProfileReport(data, title = 'Report')
+#     st_profile_report(profile)
     
 def create_radio_input(label, options):
     result = st.radio(label=label, options=options)
