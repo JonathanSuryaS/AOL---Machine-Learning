@@ -4,8 +4,6 @@ import pandas as pd
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
-from ydata_profiling import ProfileReport
-from streamlit_pandas_profiling import st_profile_report
 # simport pandas_profiling as pp
 import pickle
 # from pandas_profiling import ProfileReport
