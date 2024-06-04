@@ -16,7 +16,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
 import plotly.express as px
-
+from mlxtend.plotting import plot_decision_regions
+from PIL import Image
 
 # Global Variables
 data = pd.read_csv('trainPlane.csv')
@@ -47,6 +48,129 @@ def plot_distribution(column):
         sns.pointplot(data=data, x=column, y='satisfaction', ax=ax[1])
         ax[1].set_title(f'Pointplot {column} vs Satisfaction')
         st.pyplot(fig)
+
+
+def homepage():
+    set_background('EEEEEE')
+    st.title('Customer Airline Satisfaction')
+    st.image('Airline-satisfaction-cover-1.png')
+    st.write("""
+        The Airlines Customer Satisfaction contains data about customer feedback and flight details for passenger who have flown with specific airlines service. These datas is structured and analyzed to predict customer satisfaction based on multiple parameters such as the customer data itself, and the airlines.
+    """)
+
+    space()
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader('Customer data')
+        st.image('customer.jpeg')
+    with col2:
+        space()
+        st.write("""
+            Customer data contains various type of information about customer that can be used for analysis, prediction, and improving business strategies such as airlines service. Customer data contains both categorical and numerical which can be seen below. These various feature can be analyzed to gain useful insight which can lead to improved marketing strategies and customer experience itself during flight.
+        """)
+    space()
+    custdata = create_radio_input('Choose category', ['Category', 'Numerical'])
+
+    if custdata == 'Category':
+        custcat = ['Gender', 'Customer Type', 'Type of Travel', 'Class']
+        catdata = st.selectbox('Select data', custcat)
+        if catdata == 'Gender':
+            coltype1, coltype2 = st.columns(2)
+            with coltype1:
+                st.header('Customer Gender')
+                st.image('malefemale.jpeg')
+            with coltype2:
+                space()
+                st.write('\n')
+                st.write('''Customer Gender contain data about the gender of customer. This data can be used to analyze the pattern of customer and their preference, specifically between male and female customer as airlines passenger. By analyzing it alongside other relevant data points, businesses can gain insights that lead to improved marketing strategies, targeted product development, and a more personalized customer experience.''')
+            space()
+        elif catdata == 'Customer Type':
+            coltype1, coltype2 = st.columns(2)
+            with coltype1:
+                st.header('Customer Type')
+                st.image('loyal.jpeg')
+            with coltype2:
+                space()
+                st.write('\n')
+                st.write('''Customer type is crucial for business, understanding various customer type helps optimize marketing strategies, improve customer satisfaction, and could potentially increase loyalty. Customer type is divided by two categories, namely Loyal Customer and Disloyal Customer''')
+            space()
+            typ1,typ2 = st.columns(2)
+            with typ2:
+                disimage = Image.open('disloyal.png')
+                disimage = disimage.resize((310, 200))
+                st.subheader('Disloyal Customer')
+                st.image(disimage)
+                st.write('''Disloyal customer are those who switch airlines service / brands frequently and do not exhibit strong brand preference.''')
+            
+            with typ1:
+                loyalimage = Image.open('loyal2.jpeg')
+                loyalimage = loyalimage.resize((320, 200))
+                st.subheader('Loyal Customer')
+                st.image(loyalimage)
+                st.write('''Loyal customer are those who repeatedly choose specific airlines service / brands over competitor due to strong preference for brand / service.''')
+        elif catdata == 'Type of Travel':
+            coltype1, coltype2 = st.columns(2)
+            with coltype1:
+                st.header('Type of Travel')
+                st.image('travelheader.png')
+            with coltype2:
+                space()
+                st.write('\n')
+                st.write('''This data is about the type of travel customer had during flight. Type of travel is categorized into two categorical, Business Travel and Personal Travel. Type of Travel can be used to analyze which customer is easier to satisfy based on type of travel they had.''')
+            space()
+            typ1,typ2 = st.columns(2)
+            with typ2:
+                disimage = Image.open('personal.webp')
+                disimage = disimage.resize((310, 200))
+                st.subheader('Personal Travel')
+                st.image(disimage)
+                st.write('''In contrast, personal travel refers to trips embarked upon for non-business-related reasons, such as vacations, family visits, leisure outings, or special occasions like weddings or holidays. Personal travelers seek experiences tailored to their recreational, cultural, or social interests, with preferences ranging from budget-friendly options to luxury accommodations.''')
+            
+            with typ1:
+                loyalimage = Image.open('business.webp')
+                loyalimage = loyalimage.resize((320, 200))
+                st.subheader('Business Travel')
+                st.image(loyalimage)
+                st.write('''This category comprises journeys undertaken for professional purposes, including corporate meetings, conferences, client visits, and work-related training or events. Business travelers prioritize factors such as schedule flexibility, proximity to business destinations, and amenities conducive to productivity during transit.''')
+
+        elif catdata == 'Class':
+            coltype1, coltype2 = st.columns(2)
+            with coltype1:
+                st.header('Airlines Classes')
+                st.image('cabin.jpeg')
+            with coltype2:
+                space()
+                st.write('\n')
+                st.write('''Airlines Cabin (Classes) holds information about cabin in airlines service. These cabin aree categorized into three classes namely Business Class, Economy Plus, and Economy. With this data, we can analyze which customer is easier to satisfied given their classes.''')
+            space()
+            typ1,typ2,typ3 = st.columns(3)
+            with typ1:
+                business = Image.open('businessclass.jpeg')
+                business = business.resize((310, 200))
+                st.subheader('Business Class')
+                st.image(business)
+                st.write('''This category represents passengers who flew in business class. Business class typically offers more spacious seating, enhanced amenities, and a higher level of service compared to both economy class.''')
+            
+            with typ2:
+                ecoplus = Image.open('ecoplus.png')
+                ecoplus = ecoplus.resize((320, 200))
+                st.subheader('Economy+ Class')
+                st.image(ecoplus)
+                st.write('''This category represents passengers who flew in economy plus class. Economy Plus is a class of service offered by some airlines that provides some additional benefits over economy class, such as extra legroom or wider seats.''')
+            
+            with typ3:
+                eco = Image.open('economy.webp')
+                eco = eco.resize((320, 200))
+                st.subheader('Economy Class')
+                st.image(eco)
+                st.write('''This category represents passengers who flew in economy class. Economy class is the most basic and affordable class of service offered by airlines.''')
+
+    else:
+        custnum = ['Age', 'Flight Distance']
+        custnum = st.selectbox('Select data', custnum)
+
+    
 
 
 def EDA():
@@ -251,6 +375,39 @@ def EDA2():
     profile = ProfileReport(data, title = 'Report')
     st_profile_report(profile)
     
+def create_radio_input(label, options):
+    result = st.radio(label=label, options=options)
+    st.markdown(
+        """<style>
+      div[class*="stRadio"] > label > div[data-testid="stMarkdownContainer"] > p {
+          font-size: 20px;
+      }
+      </style>
+      """, unsafe_allow_html=True)
+    return result
+
+def create_number_input(label, min_value, max_value, value, step):
+    number = st.number_input(
+        label, min_value=min_value, max_value=max_value, value=value, step=step)
+    st.markdown(
+        """<style>
+      div[class*="stNumberInput"] > label > div[data-testid="stMarkdownContainer"] > p {
+          font-size: 20px;
+      }
+      </style>
+      """, unsafe_allow_html=True)
+    return number
+
+def create_slider(label, min_value, max_value):
+    slider = st.slider(label, min_value, max_value)
+    st.markdown(
+        """<style>
+      div[class*="stSlider"] > label > div[data-testid="stMarkdownContainer"] > p {
+          font-size: 20px;
+      }
+      </style>
+      """, unsafe_allow_html=True)
+    return slider
 
 
 def prediction():
@@ -259,41 +416,6 @@ def prediction():
     <br><h1 style='text-align: left; color: black; font-family: Arial;'>Does the customer satisfied with airline service?</h1>
     """, unsafe_allow_html=True)
     st.image('satisfied.jpg')
-
-    # Gender & Type
-    def create_radio_input(label, options):
-        result = st.radio(label=label, options=options)
-        st.markdown(
-            """<style>
-          div[class*="stRadio"] > label > div[data-testid="stMarkdownContainer"] > p {
-              font-size: 20px;
-          }
-          </style>
-          """, unsafe_allow_html=True)
-        return result
-
-    def create_number_input(label, min_value, max_value, value, step):
-        number = st.number_input(
-            label, min_value=min_value, max_value=max_value, value=value, step=step)
-        st.markdown(
-            """<style>
-          div[class*="stNumberInput"] > label > div[data-testid="stMarkdownContainer"] > p {
-              font-size: 20px;
-          }
-          </style>
-          """, unsafe_allow_html=True)
-        return number
-
-    def create_slider(label, min_value, max_value):
-        slider = st.slider(label, min_value, max_value)
-        st.markdown(
-            """<style>
-          div[class*="stSlider"] > label > div[data-testid="stMarkdownContainer"] > p {
-              font-size: 20px;
-          }
-          </style>
-          """, unsafe_allow_html=True)
-        return slider
 
     # Insert Gender
     TempCustomerGender = create_radio_input(
@@ -478,6 +600,8 @@ def Logistic():
         )
         model.fit(st.session_state.train, st.session_state.validation)
         st.session_state.Model = model
+        pred = model.predict(st.session_state.test)
+        st.session_state.Pred = pred
         st.success('Model Created, please check Result and Evaluation')
 
 def DecisionTree():
@@ -509,7 +633,11 @@ def DecisionTree():
             random_state=random_state
         )
         model.fit(st.session_state.train, st.session_state.validation)
+        pred = model.predict(st.session_state.test)
+        st.session_state.Pred = pred
         st.session_state.Model = model
+        pred = model.predict(st.session_state.test)
+        st.session_state.Pred = pred
         st.success('Model Created, please check Result and Evaluation')
 
 def RandomForest():
@@ -544,6 +672,8 @@ def RandomForest():
         )
         model.fit(st.session_state.train, st.session_state.validation)
         st.session_state.Model = model
+        pred = model.predict(st.session_state.test)
+        st.session_state.Pred = pred
         st.success('Model Created, please check Result and Evaluation')
 
 def NaiveBayes():
@@ -588,6 +718,8 @@ def XGBoost():
         )
         model.fit(st.session_state.train, st.session_state.validation)
         st.session_state.Model = model
+        pred = model.predict(st.session_state.test)
+        st.session_state.Pred = pred
         st.success('Model Created, please check Result and Evaluation')
 
 
@@ -699,8 +831,8 @@ def evaluation():
     from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, confusion_matrix, ConfusionMatrixDisplay, classification_report
     from sklearn.model_selection import cross_val_score
     pred = st.session_state.Model.predict(st.session_state.test)
-    tries = st.session_state.Model.predict(st.session_state.train)
     st.session_state.Pred = pred
+    tries = st.session_state.Model.predict(st.session_state.train)
 
     from sklearn.linear_model import LogisticRegression
     from sklearn.naive_bayes import GaussianNB
@@ -727,8 +859,10 @@ def evaluation():
     st.write(f'Cross Validation Score(10): {(cross_val_score(st.session_state.Model, st.session_state.test, st.session_state.result, cv=10).mean())*100:.2f}%')
     space()
     st.header('Model Confusion Matrix')
+
+    col1, col2 = st.columns(2)
     # Training
-    st.subheader('Training Set')
+    #st.subheader('Training Set')
     labels = ['neutral or dissatisfied', 'satisfied']
     cm_train = confusion_matrix(tries, st.session_state.validation)
     sns.heatmap(cm_train, cmap='Blues', annot=True, fmt='.0f', linecolor='white',xticklabels=labels, yticklabels=labels)
@@ -738,7 +872,7 @@ def evaluation():
     st.pyplot()
     space()
     # Test set confusion matrix
-    st.subheader('Test Set')
+    #st.subheader('Test Set')
     cm_test = confusion_matrix(pred, st.session_state.result)
     sns.heatmap(cm_test, cmap='Blues', annot=True, fmt='.0f', linecolor='white',xticklabels=labels, yticklabels=labels)
     plt.title('Confusion Matrix of Test Set', size=15)
@@ -756,21 +890,42 @@ def result():
         st.subheader('Please choose the given models in Model page')
         return
     if st.session_state.to_predict is not None:
-        st.header('Input Prediction')
 
+        
         #PCA
         from sklearn.decomposition import PCA
-        pca = PCA(n_components=3)
-        X_pca = pca.fit_transform(st.session_state.test)
+        st.subheader('Decision Boundary')
+        pca1 = PCA(n_components=3)
+        pca2 = PCA(n_components=2)
+        X_pca1 = pca1.fit_transform(st.session_state.test)
+        X_pca2 = pca2.fit_transform(st.session_state.test)
         y = st.session_state.Pred
         plt.figure(figsize=(8, 6))
         color_map = {0: 'red', 1: 'blue'}
+        
+        if isinstance(st.session_state.Model, LogisticRegression):
+            clf = LogisticRegression()
+        elif isinstance(st.session_state.Model, GaussianNB):
+            clf = GaussianNB()
+        elif isinstance(st.session_state.Model, RandomForestClassifier):
+            clf = RandomForestClassifier()
+        elif isinstance(st.session_state.Model, DecisionTreeClassifier):
+            clf = DecisionTreeClassifier()
+        elif isinstance(st.session_state.Model, XGBClassifier):
+            clf = XGBClassifier()
+
+        clf.fit(X_pca2, y)
+        plots = plot_decision_regions(X_pca2, y, clf=clf)
+        fig = plt.gcf()
+        fig
+        space()
+
 
         # Define custom labels for the legend
         labels = {0: 'neutral or dissatisfied', 1: 'satisfied'}
 
         # Create the 3D scatter plot
-        fig = px.scatter_3d(x=X_pca[:, 0], y=X_pca[:, 1], z=X_pca[:, 2], color=y,
+        fig = px.scatter_3d(x=X_pca1[:, 0], y=X_pca1[:, 1], z=X_pca1[:, 2], color=y,
                             color_discrete_map=color_map, labels={'color': 'Labels'}, color_continuous_scale=list(color_map.values()))
 
         # Update legend title
@@ -782,7 +937,8 @@ def result():
         fig.update_traces(marker=dict(size=5))
         
         # Add title and labels
-        fig.update_layout(title="Decision Boundary in 3D", 
+        st.subheader('Decision Boundary in 3D')
+        fig.update_layout( 
                           scene=dict(xaxis_title='Principal Component 1',
                                      yaxis_title='Principal Component 2',
                                      zaxis_title='Principal Component 3'))
@@ -831,8 +987,7 @@ def main():
     selected = session_state.selected_section
 
     if selected == "Home":
-        st.title("Home")
-        st.write("Welcome to the Home page.")
+        homepage()
     elif selected == "Exploratory Data Analysis":
         EDA()
     elif selected == "Input Data":
