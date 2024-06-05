@@ -557,6 +557,8 @@ def training(selected, test_size):
 # Model Model untuk Klasifikasi
 def Logistic():
     from sklearn.linear_model import LogisticRegression
+    import streamlit as st
+
     st.title("Logistic Regression Parameter Tuning")
 
     penalty_options = ['None (default)', 'l2', 'l1', 'elasticnet']
@@ -566,10 +568,15 @@ def Logistic():
     C = st.slider('C (Inverse of regularization strength, default=1.0)', 0.01, 10.0, 1.0)
 
     solver_options = ['lbfgs (default)', 'newton-cg', 'liblinear', 'sag', 'saga']
+    if penalty == 'none':
+        solver_options = ['lbfgs (default)', 'newton-cg', 'sag', 'saga']
+    elif penalty == 'l1':
+        solver_options = ['liblinear', 'saga']
+    elif penalty == 'elasticnet':
+        solver_options = ['saga']
     solver_map = {'lbfgs (default)': 'lbfgs', 'newton-cg': 'newton-cg', 'liblinear': 'liblinear', 'sag': 'sag', 'saga': 'saga'}
     solver = solver_map[st.selectbox('Solver', solver_options)]
 
-    
     if penalty == 'elasticnet':
         l1_ratio = st.slider('l1_ratio (for elasticnet, default=0.5)', 0.0, 1.0, 0.5)
     else:
@@ -598,11 +605,14 @@ def Logistic():
             n_jobs=n_jobs,
             random_state=random_state
         )
+        # Ensure the following session state variables are correctly set before calling model.fit
+        # st.session_state.train, st.session_state.validation, st.session_state.test
         model.fit(st.session_state.train, st.session_state.validation)
         st.session_state.Model = model
         pred = model.predict(st.session_state.test)
         st.session_state.Pred = pred
         st.success('Model Created, please check Result and Evaluation')
+
 
 def DecisionTree():
     from sklearn.tree import DecisionTreeClassifier
