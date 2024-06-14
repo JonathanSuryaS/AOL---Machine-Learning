@@ -1480,7 +1480,7 @@ def result():
         to_predict = st.session_state.to_predict.values
         to_predict = st.session_state.ct.transform(to_predict)
         columns_to_scale = [9, 10, 23]
-        to_predict[:, columns_to_scale] = st.session_state.sc.fit_transform(to_predict[:, columns_to_scale])
+        to_predict[:, columns_to_scale] = st.session_state.sc.transform(to_predict[:, columns_to_scale])
         if st.session_state.Model.predict(to_predict):
             st.success('Customer Satisfied')
         else:

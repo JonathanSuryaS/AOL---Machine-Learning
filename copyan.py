@@ -16,24 +16,19 @@ from xgboost import XGBClassifier
 import plotly.express as px
 from mlxtend.plotting import plot_decision_regions
 from PIL import Image
+from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler, MaxAbsScaler
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+from sklearn.compose import ColumnTransformer
 
 # Global Variables
 data = pd.read_csv('trainPlane.csv')
 if 'to_predict' not in st.session_state:
     st.session_state.to_predict = None
 if 'sc' not in st.session_state:
-    from sklearn.preprocessing import StandardScaler
-    st.session_state.sc = StandardScaler()
+    st.session_state.sc = None
 if 'ct' not in st.session_state:
-    from sklearn.preprocessing import OneHotEncoder
-    from sklearn.compose import ColumnTransformer
-    columns_to_encode = [0, 1, 3, 4]
-    st.session_state.ct = ColumnTransformer(
-        transformers=[
-            ('encode', OneHotEncoder(), columns_to_encode)
-        ],
-        remainder='passthrough'  # Keep the rest of the columns as is
-    )
+    st.session_state.ct = None
+    
 if 'Model' not in st.session_state:
     st.session_state.Model = None
 
@@ -1027,58 +1022,11 @@ def prediction():
         st.session_state.to_predict = input_data
         st.success('Data Submitted, Create your model to predict!')
 
-def getFeatures():
-    data.drop(columns=['id', 'Unnamed: 0'], inplace=True)
-    data.loc[data['satisfaction'] == 'satisfied', 'satisfaction'] = 1
-    data.loc[data['satisfaction'] == 'neutral or dissatisfied', 'satisfaction'] = 0
-    data['satisfaction'] = data['satisfaction'].astype(int)
-    data.dropna(inplace=True)
 
-    X = data.drop(columns=['satisfaction', 'Cleanliness',
-                      'Departure Delay in Minutes', 'Inflight wifi service']).values
-    y = data['satisfaction'].values
-    X = np.array(st.session_state.ct.fit_transform(X))
-    return X,y 
-
-def training(selected, test_size):
-    from sklearn.model_selection import train_test_split
-    X, y = getFeatures()
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=0, shuffle=True)
-    columns_to_scale = [9, 10, 23]
-    X_train[:, columns_to_scale] = st.session_state.sc.fit_transform(X_train[:, columns_to_scale])
-    X_test[:, columns_to_scale] = st.session_state.sc.transform(X_test[:, columns_to_scale])
-    st.session_state.train = X_train
-    st.session_state.validation = y_train
-    st.session_state.test = X_test
-    st.session_state.result = y_test
-    
-    st.markdown("""
-    <style>
-    .training {
-        font-size: 15px;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-    #model_options = ['Logistic Regression', 'NaiveBayes',
-               #'SVM','DecisionTree','RandomForest', 'XGBoost']
-    space()
-    if selected == 'Logistic Regression':
-        Logistic()
-    elif selected == 'NaiveBayes':
-        NaiveBayes()
-    elif selected == 'DecisionTree':
-        DecisionTree()
-    elif selected == 'RandomForest':
-        RandomForest()
-    elif selected == 'XGBoost':
-        XGBoost()
         
 # Model Model untuk Klasifikasi
 def Logistic():
     from sklearn.linear_model import LogisticRegression
-    import streamlit as st
-
     st.title("Logistic Regression Parameter Tuning")
 
     penalty_options = ['None (default)', 'l2', 'l1', 'elasticnet']
@@ -1132,7 +1080,7 @@ def Logistic():
         pred = model.predict(st.session_state.test)
         st.session_state.Pred = pred
         st.success('Model Created, please check Result and Evaluation')
-
+        return
 
 def DecisionTree():
     from sklearn.tree import DecisionTreeClassifier
@@ -1170,6 +1118,7 @@ def DecisionTree():
         pred = model.predict(st.session_state.test)
         st.session_state.Pred = pred
         st.success('Model Created, please check Result and Evaluation')
+        
 
 def RandomForest():
     from sklearn.ensemble import RandomForestClassifier
@@ -1253,94 +1202,131 @@ def XGBoost():
         st.session_state.Pred = pred
         st.success('Model Created, please check Result and Evaluation')
 
-
-# def svm():
-#     from sklearn.svm import SVC
-#     st.title("SVC Parameter Tuning")
-    
-#     # Define the parameter options
-#     kernel_options = ['linear', 'poly', 'rbf', 'sigmoid']
-#     kernel = st.selectbox('Kernel', kernel_options)
-    
-#     C = st.slider('C (Regularization parameter)', 0.01, 10.0, 1.0)
-#     degree = st.slider('Degree (for poly kernel)', 1, 5, 3)
-#     gamma_options = ['scale', 'auto']
-#     gamma = st.selectbox('Gamma', gamma_options)
-#     coef0 = ''
-#     if kernel in ['poly', 'sigmoid']:
-#         coef0 = st.slider('Coef0 (for poly/sigmoid kernels)', 0.0, 1.0, 0.0)
-#     else:
-#         coef0 = 0.0  # Default value for other kernels
-#     shrinking = st.checkbox('Shrinking', value=True)
-#     probability = st.checkbox('Probability', value=False)
-#     tol = st.slider('Tolerance for stopping criterion', 1e-5, 1e-1, 1e-3)
-#     cache_size = st.slider('Cache size (MB)', 100, 1000, 200)
-#     class_weight_options = ['None', 'balanced']
-#     class_weight = st.selectbox('Class weight', class_weight_options)
-#     class_weight = None if class_weight == 'None' else 'balanced'
-#     verbose = st.checkbox('Verbose', value=False)
-#     max_iter = st.slider('Max iterations', -1, 1000, -1)
-#     decision_function_shape_options = ['ovr', 'ovo']
-#     decision_function_shape = st.selectbox('Decision function shape', decision_function_shape_options)
-#     break_ties = st.checkbox('Break ties', value=False)
-#     random_state = st.slider('Random state', 0, 100, 42)
-    
-#     predict = st.button('Deploy Model')
-#     if predict:
-#         svc = SVC(
-#             C=C,
-#             kernel=kernel,
-#             degree=degree,
-#             gamma=gamma,
-#             coef0=coef0,
-#             shrinking=shrinking,
-#             probability=probability,
-#             tol=tol,
-#             cache_size=cache_size,
-#             class_weight=class_weight,
-#             verbose=verbose,
-#             max_iter=max_iter,
-#             decision_function_shape=decision_function_shape,
-#             break_ties=break_ties,
-#             random_state=random_state
-#         )   
-#         svc.fit(st.session_state.train, st.session_state.validation)
-#         st.session_state.Model = svc
         
+def getFeatures(selected_encoder):
+    data.drop(columns=['id', 'Unnamed: 0'], inplace=True)
+    data.loc[data['satisfaction'] == 'satisfied', 'satisfaction'] = 1
+    data.loc[data['satisfaction'] == 'neutral or dissatisfied', 'satisfaction'] = 0
+    data['satisfaction'] = data['satisfaction'].astype(int)
+    data.dropna(inplace=True)
+    X = data.drop(columns=['satisfaction', 'Cleanliness',
+                      'Departure Delay in Minutes', 'Inflight wifi service'])
+    columns_to_encode_indices = [X.columns.get_loc(col) for col in X.select_dtypes(include=['object']).columns]
+    y = data['satisfaction'].values
+    if selected_encoder == 'OneHotEncoder': 
+        st.session_state.ct = ColumnTransformer(
+            transformers=[
+                ('encode', OneHotEncoder(), columns_to_encode_indices)
+            ],
+            remainder='passthrough'  # Keep the rest of the columns as is
+        )
+        X = np.array(st.session_state.ct.fit_transform(X))
+        return X,y 
+    elif selected_encoder == 'LabelEncoder':
+        for col_index in columns_to_encode_indices:
+            st.session_state.ct = LabelEncoder()
+            X.iloc[:, col_index] = st.session_state.ct.fit_transform(X.iloc[:, col_index])
+        X = X.values
+        return X,y
 
-def ChooseModel():
-    set_background('FAF2D3')
-    st.markdown("""
-    <br><h1 style='text-align: left; color: black; font-family: Arial;'>Model for Classification</h1>
-    """, unsafe_allow_html=True)
-    
-    
-    def create_slider(label, min_value, max_value):
-        slider = st.slider(label, min_value, max_value)
-        st.markdown(
-            """<style>
-          div[class*="stSlider"] > label > div[data-testid="stMarkdownContainer"] > p {
-              font-size: 20px;
-          }
-          </style>
-          """, unsafe_allow_html=True)
-        return slider
-    test_size = create_slider('Insert Test Size', 0.1, 0.9)
+def scaler(selected_scaler):
+    if selected_scaler == 'StandardScaler':
+        st.session_state.sc = StandardScaler()
+    elif selected_scaler == 'MinMaxScaler':
+        st.session_state.sc = MinMaxScaler()
+    elif selected_scaler == 'RobustScaler':
+        st.session_state.sc = RobustScaler()
+    elif selected_scaler == 'MaxAbsScaler':
+        st.session_state.sc =  MaxAbsScaler()
+
+def training(selected_model, test_size, selected_scaler, selected_encoder):
+    from sklearn.model_selection import train_test_split
+    X, y = getFeatures(selected_encoder)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=0, shuffle=True)
+    scaler(selected_scaler)
+    if selected_encoder == 'OneHotEncoder':
+        columns_to_scale = [9, 10, 23]
+        X_train[:, columns_to_scale] = st.session_state.sc.fit_transform(X_train[:, columns_to_scale])
+        X_test[:, columns_to_scale] = st.session_state.sc.transform(X_test[:, columns_to_scale])
+    else:
+        columns_to_scale = [2, 5, 18]
+        X_train[:, columns_to_scale] = st.session_state.sc.fit_transform(X_train[:, columns_to_scale])
+        X_test[:, columns_to_scale] = st.session_state.sc.transform(X_test[:, columns_to_scale])
+    st.session_state.train = X_train
+    st.session_state.validation = y_train
+    st.session_state.test = X_test
+    st.session_state.result = y_test
     
     st.markdown("""
     <style>
-    .custom-label {
-        font-size: 20px;
+    .training {
+        font-size: 15px;
     }
     </style>
     """, unsafe_allow_html=True)
-    # Add a label with the custom CSS class
-    st.markdown('<div class="custom-label">Choose Models</div>', unsafe_allow_html=True)
-    
-    model_options = ['Logistic Regression', 'NaiveBayes',
-                'DecisionTree','RandomForest', 'XGBoost']
-    selected_models = st.selectbox('', model_options)
-    training(selected_models, test_size)
+
+    space()
+    if selected_model == 'Logistic Regression':
+        Logistic()
+    elif selected_model == 'NaiveBayes':
+        NaiveBayes()
+    elif selected_model == 'DecisionTree':
+        DecisionTree()
+    elif selected_model == 'RandomForest':
+        RandomForest()
+    elif selected_model == 'XGBoost':
+        XGBoost()
+    return
+        
+        
+def ChooseModel():
+    if st.session_state.Model == None:
+        set_background('FAF2D3')
+        st.markdown("""
+        <br><h1 style='text-align: left; color: black; font-family: Arial;'>Model for Classification</h1>
+        """, unsafe_allow_html=True)
+        
+        st.subheader('Training Configuration')
+        def create_slider(label, min_value, max_value):
+            slider = st.slider(label, min_value, max_value)
+            st.markdown(
+                """<style>
+            div[class*="stSlider"] > label > div[data-testid="stMarkdownContainer"] > p {
+                font-size: 20px;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+            return slider
+        test_size = create_slider('Insert Test Size', 0.1, 0.9)
+        
+        st.markdown("""
+        <style>
+        .custom-label {
+            font-size: 20px;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        st.markdown('<div class="custom-label">Choose Models</div>', unsafe_allow_html=True)
+        model_options = ['Logistic Regression', 'NaiveBayes',
+                    'DecisionTree','RandomForest', 'XGBoost']
+        selected_models = st.selectbox('', model_options)
+        st.write('')
+        #space()
+        st.markdown('<div class="custom-label">Choose Scalers</div>', unsafe_allow_html=True)
+        scaler_options = ['StandardScaler', 'MinMaxScaler','RobustScaler', 'MaxAbsScaler']
+        selected_scaler = st.selectbox('', scaler_options)
+        st.write('')
+        #space()
+        st.markdown('<div class="custom-label">Choose Encoder</div>', unsafe_allow_html=True)
+        encoder_options = ['OneHotEncoder', 'LabelEncoder']
+        selected_encoder = create_radio_input('',encoder_options)
+        training(selected_models, test_size, selected_scaler, selected_encoder)
+    else:
+        set_background('ff0f0f')
+        st.header('Are you sure want to proceed?')
+        confbutton = st.button('Yes, Confirm')
+        if confbutton:
+            st.session_state.Model = None
     
 
 
@@ -1473,19 +1459,29 @@ def result():
                           scene=dict(xaxis_title='Principal Component 1',
                                      yaxis_title='Principal Component 2',
                                      zaxis_title='Principal Component 3'))
-        
+        #columns_to_scale = [2, 5, 18]
         # Show the figure
         st.plotly_chart(fig)
-
-        to_predict = st.session_state.to_predict.values
-        to_predict = st.session_state.ct.transform(to_predict)
-        columns_to_scale = [9, 10, 23]
-        to_predict[:, columns_to_scale] = st.session_state.sc.fit_transform(to_predict[:, columns_to_scale])
+        
+        if isinstance(st.session_state.ct, LabelEncoder):
+            X = st.session_state.to_predict
+            columns_to_encode_indices = [X.columns.get_loc(col) for col in X.select_dtypes(include=['object']).columns]
+            for col_index in columns_to_encode_indices:
+                st.session_state.ct = LabelEncoder()
+                X.iloc[:, col_index] = st.session_state.ct.fit_transform(X.iloc[:, col_index])
+            X = X.values
+            columns_to_scale = [2, 5, 18]
+            X[:, columns_to_scale] = st.session_state.sc.transform(X[:, columns_to_scale])
+            to_predict = X
+        else:
+            to_predict = st.session_state.to_predict.values
+            to_predict = st.session_state.ct.transform(to_predict)
+            columns_to_scale = [9, 10, 23]
+            to_predict[:, columns_to_scale] = st.session_state.sc.transform(to_predict[:, columns_to_scale])
         if st.session_state.Model.predict(to_predict):
             st.success('Customer Satisfied')
         else:
             st.error('Customer is not satisfied')
-        #predict.iloc[:, [0, 1, 14]] = st.session_state.sc.transform(predict.iloc[:, [0, 1, 14]])
     else:
         set_background('ff0f0f')
         st.subheader('No data has been submitted')
