@@ -897,7 +897,7 @@ def EDA():
             return
         space()
         st.session_state.Data = data[selected_features]
-    else:
+    elif st.button('Recommended Features'):
         st.session_state.Data = data.drop(columns=['satisfaction', 'Cleanliness', 'Departure Delay in Minutes', 'Inflight wifi service','id', 'Unnamed: 0'])
     st.write('Selected Features: ')
     st.session_state.Data
