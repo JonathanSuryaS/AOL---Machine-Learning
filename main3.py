@@ -897,11 +897,10 @@ def EDA():
             return
         space()
         st.session_state.Data = data[selected_features]
-        st.write('Selected Features: ')
-        st.session_state.Data
     else:
-        st.session_state.Data = data.drop(columns=['satisfaction', 'Cleanliness', 'Departure Delay in Minutes', 'Inflight wifi service'])
-
+        st.session_state.Data = data.drop(columns=['satisfaction', 'Cleanliness', 'Departure Delay in Minutes', 'Inflight wifi service','id', 'Unnamed: 0'])
+    st.write('Selected Features: ')
+    st.session_state.Data
     
 def create_radio_input(label, options):
     result = st.radio(label=label, options=options)
@@ -939,6 +938,7 @@ def create_slider(label, min_value, max_value):
 
 
 def prediction():
+    st.session_state.Data
     set_background('FBC687')
     st.markdown("""
     <br><h1 style='text-align: left; color: black; font-family: Arial;'>Does the customer satisfied with airline service?</h1>
@@ -1229,7 +1229,8 @@ def getFeatures(selected_encoder):
    
     
     y = data['satisfaction'].values
-    if selected_encoder == 'OneHotEncoder': 
+    if selected_encoder == 'OneHotEncoder':
+        st.session_state.ct = OneHotEncoder() 
         X = pd.get_dummies(X)
         columns_to_check = ['Age', 'Flight Distance', 'Departure Delay in Minutes', 'Arrival Delay in Minutes']
         scale_indices = [idx for idx, col in enumerate(X.columns) if col in columns_to_check]
