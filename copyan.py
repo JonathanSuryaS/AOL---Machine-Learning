@@ -16,19 +16,21 @@ from xgboost import XGBClassifier
 import plotly.express as px
 from mlxtend.plotting import plot_decision_regions
 from PIL import Image
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler, MaxAbsScaler
 
 # Global Variables
 data = pd.read_csv('trainPlane.csv')
 if 'to_predict' not in st.session_state:
     st.session_state.to_predict = None
-if 'sc' not in st.session_state:
-    from sklearn.preprocessing import StandardScaler
-    st.session_state.sc = StandardScaler()
-if 'ct' not in st.session_state:
+if 'scaler' not in st.session_state:
+    st.session_state.scaler = None
+if 'encoder' not in st.session_state:
     from sklearn.preprocessing import OneHotEncoder
     from sklearn.compose import ColumnTransformer
     columns_to_encode = [0, 1, 3, 4]
-    st.session_state.ct = ColumnTransformer(
+    st.session_state.encoder = ColumnTransformer(
         transformers=[
             ('encode', OneHotEncoder(), columns_to_encode)
         ],
@@ -223,7 +225,7 @@ def homepage():
             
             with typ2:
                 ecoplus = Image.open('ecoplus.png')
-                ecoplus = ecoplus.resize((320, 200))
+                ecoplus = ecoplus.resize((320, 205))
                 st.subheader('Economy+ Class')
                 st.image(ecoplus)
                 st.markdown(
@@ -249,6 +251,7 @@ def homepage():
                     """, 
                     unsafe_allow_html=True
                 )
+                
         
         elif catdata == 'Satisfied or Dissatisfied':
             coltype1, coltype2 = st.columns(2)
@@ -260,10 +263,18 @@ def homepage():
             with coltype2:
                 space()
                 st.write('\n')
-                st.write('''Customer satisfaction provide detailed overview of passenger airlines in terms of experience and 
+                st.markdown(
+                    """
+                    <div style='text-align: justify;'>
+                    Customer satisfaction provide detailed overview of passenger airlines in terms of experience and 
                          satisfaction levels, encapsulating various aspect by both customer data such as age, airliness class and the 
                          airline data itself, arrival delay, airlines service, etc. Customer Satisfaction indicates whether passengers were satisfied
-                         or dissatisfied with their airlines experience.''')
+                         or dissatisfied with their airlines experience.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
+                
             space()
             typ1,typ2 = st.columns(2)
             with typ2:
@@ -271,14 +282,28 @@ def homepage():
                 disimage = disimage.resize((310, 200))
                 st.subheader('Dissatisfied Customer')
                 st.image(disimage)
-                st.write('''This category comprises passengers who had a negative travel experience, as reflected in their feedback and lower ratings. Common issues leading to dissatisfaction include flight delays or cancellations, uncomfortable seating, unprofessional or unhelpful staff, poor in-flight services, and inadequate handling of complaints or issues. Dissatisfied customers may express their discontent through negative reviews and are less likely to choose the airline for future travel.''')
+                st.markdown(
+                    """
+                    <div style='text-align: justify;margin-right:30px'>
+                    This category comprises passengers who had a negative travel experience, as reflected in their feedback and lower ratings. Common issues leading to dissatisfaction include flight delays or cancellations, uncomfortable seating, unprofessional or unhelpful staff, poor in-flight services, and inadequate handling of complaints or issues. Dissatisfied customers may express their discontent through negative reviews and are less likely to choose the airline for future travel.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
             
             with typ1:
                 loyalimage = Image.open('satisfiedcust.jpg')
                 loyalimage = loyalimage.resize((320, 200))
                 st.subheader('Satisfied Customer')
                 st.image(loyalimage)
-                st.write('''This category includes passengers who had a positive travel experience, expressed through favorable feedback and high ratings. Indicators of satisfaction might include on-time departures and arrivals, comfortable seating, courteous staff, efficient check-in processes, in-flight amenities, and overall value for money. Satisfied customers are likely to recommend the airline to others and exhibit higher levels of brand loyalty.''')
+                st.markdown(
+                    """
+                    <div style='text-align: justify;margin-right:20px'>
+                    This category includes passengers who had a positive travel experience, expressed through favorable feedback and high ratings. Indicators of satisfaction might include on-time departures and arrivals, comfortable seating, courteous staff, efficient check-in processes, in-flight amenities, and overall value for money. Satisfied customers are likely to recommend the airline to others and exhibit higher levels of brand loyalty.
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
             
     elif custdata == 'Numerical':
         custnum = ['Age', 'Flight Distance']
@@ -373,7 +398,7 @@ def homepage():
                 space()
                 st.markdown(
                     """
-                    <div style='text-align: justify;'>
+                    <div style='text-align: justify;margin-top:-20px'>
                     Departure / Arrival time convenient evaluates how convenient passengers find the schedueled departure and arrival times.
                     It reflects whether flight times align well with passenger's schedueles and preferences, impacting their overall travel experience.
                     </div>
@@ -393,7 +418,7 @@ def homepage():
                 space()
                 st.markdown(
                     """
-                    <div style='text-align: justify;'>
+                    <div style='text-align: justify;margin-top:-20px'>
                     This data measures the user - friendliness and efficiency of airline's online booking system. It includes aspect such as website or
                     app interface, speed of booking, availability of necesseary information, and simplicity of booking process.
                     </div>
@@ -891,6 +916,8 @@ def EDA():
             sns.barplot(data = data, x = data[features1], y = data[features2])
             st.pyplot(fig)
     
+    
+    
 # def EDA2():
 #     profile = ProfileReport(data, title = 'Report')
 #     st_profile_report(profile)
@@ -1037,47 +1064,12 @@ def getFeatures():
     X = data.drop(columns=['satisfaction', 'Cleanliness',
                       'Departure Delay in Minutes', 'Inflight wifi service']).values
     y = data['satisfaction'].values
-    X = np.array(st.session_state.ct.fit_transform(X))
+    X = np.array(st.session_state.encoder.fit_transform(X))
     return X,y 
-
-def training(selected, test_size):
-    from sklearn.model_selection import train_test_split
-    X, y = getFeatures()
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=0, shuffle=True)
-    columns_to_scale = [9, 10, 23]
-    X_train[:, columns_to_scale] = st.session_state.sc.fit_transform(X_train[:, columns_to_scale])
-    X_test[:, columns_to_scale] = st.session_state.sc.transform(X_test[:, columns_to_scale])
-    st.session_state.train = X_train
-    st.session_state.validation = y_train
-    st.session_state.test = X_test
-    st.session_state.result = y_test
-    
-    st.markdown("""
-    <style>
-    .training {
-        font-size: 15px;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-    #model_options = ['Logistic Regression', 'NaiveBayes',
-               #'SVM','DecisionTree','RandomForest', 'XGBoost']
-    space()
-    if selected == 'Logistic Regression':
-        Logistic()
-    elif selected == 'NaiveBayes':
-        NaiveBayes()
-    elif selected == 'DecisionTree':
-        DecisionTree()
-    elif selected == 'RandomForest':
-        RandomForest()
-    elif selected == 'XGBoost':
-        XGBoost()
         
 # Model Model untuk Klasifikasi
 def Logistic():
     from sklearn.linear_model import LogisticRegression
-    import streamlit as st
 
     st.title("Logistic Regression Parameter Tuning")
 
@@ -1253,68 +1245,12 @@ def XGBoost():
         st.session_state.Pred = pred
         st.success('Model Created, please check Result and Evaluation')
 
-
-# def svm():
-#     from sklearn.svm import SVC
-#     st.title("SVC Parameter Tuning")
-    
-#     # Define the parameter options
-#     kernel_options = ['linear', 'poly', 'rbf', 'sigmoid']
-#     kernel = st.selectbox('Kernel', kernel_options)
-    
-#     C = st.slider('C (Regularization parameter)', 0.01, 10.0, 1.0)
-#     degree = st.slider('Degree (for poly kernel)', 1, 5, 3)
-#     gamma_options = ['scale', 'auto']
-#     gamma = st.selectbox('Gamma', gamma_options)
-#     coef0 = ''
-#     if kernel in ['poly', 'sigmoid']:
-#         coef0 = st.slider('Coef0 (for poly/sigmoid kernels)', 0.0, 1.0, 0.0)
-#     else:
-#         coef0 = 0.0  # Default value for other kernels
-#     shrinking = st.checkbox('Shrinking', value=True)
-#     probability = st.checkbox('Probability', value=False)
-#     tol = st.slider('Tolerance for stopping criterion', 1e-5, 1e-1, 1e-3)
-#     cache_size = st.slider('Cache size (MB)', 100, 1000, 200)
-#     class_weight_options = ['None', 'balanced']
-#     class_weight = st.selectbox('Class weight', class_weight_options)
-#     class_weight = None if class_weight == 'None' else 'balanced'
-#     verbose = st.checkbox('Verbose', value=False)
-#     max_iter = st.slider('Max iterations', -1, 1000, -1)
-#     decision_function_shape_options = ['ovr', 'ovo']
-#     decision_function_shape = st.selectbox('Decision function shape', decision_function_shape_options)
-#     break_ties = st.checkbox('Break ties', value=False)
-#     random_state = st.slider('Random state', 0, 100, 42)
-    
-#     predict = st.button('Deploy Model')
-#     if predict:
-#         svc = SVC(
-#             C=C,
-#             kernel=kernel,
-#             degree=degree,
-#             gamma=gamma,
-#             coef0=coef0,
-#             shrinking=shrinking,
-#             probability=probability,
-#             tol=tol,
-#             cache_size=cache_size,
-#             class_weight=class_weight,
-#             verbose=verbose,
-#             max_iter=max_iter,
-#             decision_function_shape=decision_function_shape,
-#             break_ties=break_ties,
-#             random_state=random_state
-#         )   
-#         svc.fit(st.session_state.train, st.session_state.validation)
-#         st.session_state.Model = svc
-        
-
-def ChooseModel():
+# Harus mereturn  test size, scaler
+def config_training():
     set_background('FAF2D3')
     st.markdown("""
     <br><h1 style='text-align: left; color: black; font-family: Arial;'>Model for Classification</h1>
     """, unsafe_allow_html=True)
-    
-    
     def create_slider(label, min_value, max_value):
         slider = st.slider(label, min_value, max_value)
         st.markdown(
@@ -1327,6 +1263,37 @@ def ChooseModel():
         return slider
     test_size = create_slider('Insert Test Size', 0.1, 0.9)
     
+    
+
+def training(selected, test_size):
+    from sklearn.model_selection import train_test_split
+    X, y = getFeatures()
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=0, shuffle=True)
+    columns_to_scale = [9, 10, 23]
+    X_train[:, columns_to_scale] = st.session_state.scaler.fit_transform(X_train[:, columns_to_scale])
+    X_test[:, columns_to_scale] = st.session_state.scaler.transform(X_test[:, columns_to_scale])
+    st.session_state.train = X_train
+    st.session_state.validation = y_train
+    st.session_state.test = X_test
+    st.session_state.result = y_test
+    space()
+    if selected == 'Logistic Regression':
+        Logistic()
+    elif selected == 'NaiveBayes':
+        NaiveBayes()
+    elif selected == 'DecisionTree':
+        DecisionTree()
+    elif selected == 'RandomForest':
+        RandomForest()
+    elif selected == 'XGBoost':
+        XGBoost()
+
+def ChooseModel():
+    set_background('FAF2D3')
+    st.markdown("""
+    <br><h1 style='text-align: left; color: black; font-family: Arial;'>Model for Classification</h1>
+    """, unsafe_allow_html=True)
+    
     st.markdown("""
     <style>
     .custom-label {
@@ -1336,11 +1303,32 @@ def ChooseModel():
     """, unsafe_allow_html=True)
     # Add a label with the custom CSS class
     st.markdown('<div class="custom-label">Choose Models</div>', unsafe_allow_html=True)
-    
     model_options = ['Logistic Regression', 'NaiveBayes',
                 'DecisionTree','RandomForest', 'XGBoost']
     selected_models = st.selectbox('', model_options)
-    training(selected_models, test_size)
+    #space()
+    st.write('')
+    #st.markdown('<div class="custom-label">Choose Scaler</div>', unsafe_allow_html=True)
+    radio_scalers = ['StandardScaler', 'MinMaxScaler', 'RobustScaler', 'MaxAbsScaler']
+    scaler_choice = create_radio_input('Choose Scaler', radio_scalers)
+    # Set scaler based on choice
+    st.write('')
+    #radio_encoder = ['OneHotEncoder', 'LabelEncoder']
+    #encoder__choice = create_radio_input('Choose Encoder', radio_encoder)
+    train_config = st.button('Deploy Train Configuration')
+    if train_config:
+        if scaler_choice == 'StandardScaler':
+            st.session_state.scaler = StandardScaler()
+        elif scaler_choice == 'MinMaxScaler':
+            st.session_state.scaler = MinMaxScaler()
+        elif scaler_choice == 'RobustScaler':
+            st.session_state.scaler = RobustScaler()
+        elif scaler_choice == 'MaxAbsScaler':
+            st.session_state.scaler = MaxAbsScaler()
+        training(selected_models, test_size)
+        return
+        #st .success('Model Created')
+
     
 
 
@@ -1478,9 +1466,9 @@ def result():
         st.plotly_chart(fig)
 
         to_predict = st.session_state.to_predict.values
-        to_predict = st.session_state.ct.transform(to_predict)
+        to_predict = st.session_state.encoder.transform(to_predict)
         columns_to_scale = [9, 10, 23]
-        to_predict[:, columns_to_scale] = st.session_state.sc.fit_transform(to_predict[:, columns_to_scale])
+        to_predict[:, columns_to_scale] = st.session_state.scaler.fit_transform(to_predict[:, columns_to_scale])
         if st.session_state.Model.predict(to_predict):
             st.success('Customer Satisfied')
         else:
