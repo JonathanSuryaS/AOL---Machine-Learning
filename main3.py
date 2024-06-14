@@ -28,9 +28,10 @@ if 'sc' not in st.session_state:
     st.session_state.sc = None
 if 'ct' not in st.session_state:
     st.session_state.ct = None
-    
 if 'Model' not in st.session_state:
     st.session_state.Model = None
+if 'Data' not in st.session_state:
+    st.session_state.Data = []
 
 def plot_distribution(column):
         fig, ax = plt.subplots(1, 2, figsize=(18, 8))
@@ -861,34 +862,46 @@ def EDA():
     features2 = st.selectbox('Select feature 2 (Y variables)', features)
     if features1 == features2:
         st.error('Please choose a different variables / features')
-        return
-    fig = plt.figure(figsize=(18, 8))
-    plt.title(f"Plot {features1} vs {features2}")
-    if str(plotting_type) == 'Lineplot':
-        if hue_check:
-            sns.lineplot(data = data, x = data[features1], y = data[features2], hue = 'satisfaction')
-            st.pyplot(fig)
-        else:
-            sns.lineplot(data = data, x = data[features1], y = data[features2])
-            st.pyplot(fig)
-    elif str(plotting_type) == 'Scatterplot':
-        if hue_check:
-            sns.scatterplot(data = data, x = data[features1], y = data[features2], hue = 'satisfaction')
-            st.pyplot(fig)
-        else:
-            sns.scatterplot(data = data, x = data[features1], y = data[features2])
-            st.pyplot(fig)
+        #return
     else:
-        if hue_check:
-            sns.barplot(data = data, x = data[features1], y = data[features2], hue = 'satisfaction')
-            st.pyplot(fig)
+        fig = plt.figure(figsize=(18, 8))
+        plt.title(f"Plot {features1} vs {features2}")
+        if str(plotting_type) == 'Lineplot':
+            if hue_check:
+                sns.lineplot(data = data, x = data[features1], y = data[features2], hue = 'satisfaction')
+                st.pyplot(fig)
+            else:
+                sns.lineplot(data = data, x = data[features1], y = data[features2])
+                st.pyplot(fig)
+        elif str(plotting_type) == 'Scatterplot':
+            if hue_check:
+                sns.scatterplot(data = data, x = data[features1], y = data[features2], hue = 'satisfaction')
+                st.pyplot(fig)
+            else:
+                sns.scatterplot(data = data, x = data[features1], y = data[features2])
+                st.pyplot(fig)
         else:
-            sns.barplot(data = data, x = data[features1], y = data[features2])
-            st.pyplot(fig)
-    
-# def EDA2():
-#     profile = ProfileReport(data, title = 'Report')
-#     st_profile_report(profile)
+            if hue_check:
+                sns.barplot(data = data, x = data[features1], y = data[features2], hue = 'satisfaction')
+                st.pyplot(fig)
+            else:
+                sns.barplot(data = data, x = data[features1], y = data[features2])
+                st.pyplot(fig)
+    space()
+    st.subheader('Feature Selection')
+    available_features = data.drop(columns=['id', 'Unnamed: 0', 'satisfaction']).columns.tolist()
+    selected_features = st.multiselect('Select Features to Include', available_features, default=available_features)
+    if st.button('Run Feature Selection'):
+        if len(selected_features) < 3:
+            st.error('You must at least have 4 features available')
+            return
+        space()
+        st.session_state.Data = data[selected_features]
+        st.write('Selected Features: ')
+        st.session_state.Data
+    else:
+        st.session_state.Data = data.drop(columns=['satisfaction', 'Cleanliness', 'Departure Delay in Minutes', 'Inflight wifi service'])
+
     
 def create_radio_input(label, options):
     result = st.radio(label=label, options=options)
@@ -1018,7 +1031,8 @@ def prediction():
     
     space()
     if PredictButton:
-        input_data.drop(columns=['Cleanliness', 'Departure Delay in Minutes', 'Inflight wifi service'], inplace= True)
+        features_to_drop = [col for col in input_data.columns if col not in st.session_state.Data.columns]
+        input_data = input_data.drop(columns=features_to_drop)
         st.session_state.to_predict = input_data
         st.success('Data Submitted, Create your model to predict!')
 
@@ -1202,32 +1216,36 @@ def XGBoost():
         st.session_state.Pred = pred
         st.success('Model Created, please check Result and Evaluation')
 
+
+
         
 def getFeatures(selected_encoder):
-    data.drop(columns=['id', 'Unnamed: 0'], inplace=True)
+    X = st.session_state.Data
     data.loc[data['satisfaction'] == 'satisfied', 'satisfaction'] = 1
     data.loc[data['satisfaction'] == 'neutral or dissatisfied', 'satisfaction'] = 0
     data['satisfaction'] = data['satisfaction'].astype(int)
     data.dropna(inplace=True)
-    X = data.drop(columns=['satisfaction', 'Cleanliness',
-                      'Departure Delay in Minutes', 'Inflight wifi service'])
-    columns_to_encode_indices = [X.columns.get_loc(col) for col in X.select_dtypes(include=['object']).columns]
+    X.dropna(inplace = True)
+   
+    
     y = data['satisfaction'].values
     if selected_encoder == 'OneHotEncoder': 
-        st.session_state.ct = ColumnTransformer(
-            transformers=[
-                ('encode', OneHotEncoder(), columns_to_encode_indices)
-            ],
-            remainder='passthrough'  # Keep the rest of the columns as is
-        )
-        X = np.array(st.session_state.ct.fit_transform(X))
-        return X,y 
+        X = pd.get_dummies(X)
+        columns_to_check = ['Age', 'Flight Distance', 'Departure Delay in Minutes', 'Arrival Delay in Minutes']
+        scale_indices = [idx for idx, col in enumerate(X.columns) if col in columns_to_check]
+        X = X.values
+        #X
+        return X,y, scale_indices 
     elif selected_encoder == 'LabelEncoder':
+        columns_to_check = ['Age', 'Flight Distance', 'Departure Delay in Minutes', 'Arrival Delay in Minutes']
+        scale_indices = [idx for idx, col in enumerate(X.columns) if col in columns_to_check]
+        columns_to_encode_indices = [X.columns.get_loc(col) for col in X.select_dtypes(include=['object']).columns]
         for col_index in columns_to_encode_indices:
             st.session_state.ct = LabelEncoder()
             X.iloc[:, col_index] = st.session_state.ct.fit_transform(X.iloc[:, col_index])
         X = X.values
-        return X,y
+        return X,y, scale_indices
+
 
 def scaler(selected_scaler):
     if selected_scaler == 'StandardScaler':
@@ -1241,15 +1259,13 @@ def scaler(selected_scaler):
 
 def training(selected_model, test_size, selected_scaler, selected_encoder):
     from sklearn.model_selection import train_test_split
-    X, y = getFeatures(selected_encoder)
+    X, y, columns_to_scale = getFeatures(selected_encoder)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=0, shuffle=True)
     scaler(selected_scaler)
     if selected_encoder == 'OneHotEncoder':
-        columns_to_scale = [9, 10, 23]
         X_train[:, columns_to_scale] = st.session_state.sc.fit_transform(X_train[:, columns_to_scale])
         X_test[:, columns_to_scale] = st.session_state.sc.transform(X_test[:, columns_to_scale])
     else:
-        columns_to_scale = [2, 5, 18]
         X_train[:, columns_to_scale] = st.session_state.sc.fit_transform(X_train[:, columns_to_scale])
         X_test[:, columns_to_scale] = st.session_state.sc.transform(X_test[:, columns_to_scale])
     st.session_state.train = X_train
@@ -1469,19 +1485,27 @@ def result():
             for col_index in columns_to_encode_indices:
                 st.session_state.ct = LabelEncoder()
                 X.iloc[:, col_index] = st.session_state.ct.fit_transform(X.iloc[:, col_index])
+            columns_to_check = ['Age', 'Flight Distance', 'Departure Delay in Minutes', 'Arrival Delay in Minutes']
+            scale_indices = [idx for idx, col in enumerate(X.columns) if col in columns_to_check]
             X = X.values
-            columns_to_scale = [2, 5, 18]
-            X[:, columns_to_scale] = st.session_state.sc.transform(X[:, columns_to_scale])
+            X[:, scale_indices] = st.session_state.sc.transform(X[:, scale_indices])
             to_predict = X
+            if st.session_state.Model.predict(to_predict):
+                st.success('Customer Satisfied')
+            else:
+                st.error('Customer is not satisfied')
         else:
-            to_predict = st.session_state.to_predict.values
-            to_predict = st.session_state.ct.transform(to_predict)
-            columns_to_scale = [9, 10, 23]
-            to_predict[:, columns_to_scale] = st.session_state.sc.transform(to_predict[:, columns_to_scale])
-        if st.session_state.Model.predict(to_predict):
-            st.success('Customer Satisfied')
-        else:
-            st.error('Customer is not satisfied')
+            dummy = pd.concat([st.session_state.Data, st.session_state.to_predict], ignore_index=True)
+            dummy = pd.get_dummies(dummy)
+            columns_to_check = ['Age', 'Flight Distance', 'Departure Delay in Minutes', 'Arrival Delay in Minutes']
+            scale_indices = [idx for idx, col in enumerate(dummy.columns) if col in columns_to_check]
+            dummy = dummy.values
+            dummy[:, scale_indices] = st.session_state.sc.transform(dummy[:, scale_indices])
+            to_predict = dummy[-1]
+            if st.session_state.Model.predict([to_predict]):
+                st.success('Customer Satisfied')
+            else:
+                st.error('Customer is not satisfied')
     else:
         set_background('ff0f0f')
         st.subheader('No data has been submitted')
