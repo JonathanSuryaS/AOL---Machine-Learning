@@ -940,7 +940,6 @@ def create_slider(label, min_value, max_value):
 
 
 def prediction():
-    st.session_state.Data
     set_background('FBC687')
     st.markdown("""
     <br><h1 style='text-align: left; color: black; font-family: Arial;'>Does the customer satisfied with airline service?</h1>
