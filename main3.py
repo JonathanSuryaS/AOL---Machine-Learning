@@ -897,8 +897,10 @@ def EDA():
             return
         space()
         st.session_state.Data = data[selected_features]
+        st.session_state.Data['satisfaction'] = data['satisfaction']
     elif st.button('Recommended Features'):
         st.session_state.Data = data.drop(columns=['satisfaction', 'Cleanliness', 'Departure Delay in Minutes', 'Inflight wifi service','id', 'Unnamed: 0'])
+        st.session_state.Data['satisfaction'] = data['satisfaction']
     st.write('Selected Features: ')
     st.session_state.Data
     
@@ -1220,15 +1222,13 @@ def XGBoost():
 
         
 def getFeatures(selected_encoder):
-    X = st.session_state.Data
-    data.loc[data['satisfaction'] == 'satisfied', 'satisfaction'] = 1
-    data.loc[data['satisfaction'] == 'neutral or dissatisfied', 'satisfaction'] = 0
-    data['satisfaction'] = data['satisfaction'].astype(int)
-    data.dropna(inplace=True)
-    X.dropna(inplace = True)
-   
-    
-    y = data['satisfaction'].values
+    df = st.session_state.Data
+    df.loc[df['satisfaction'] == 'satisfied', 'satisfaction'] = 1
+    df.loc[df['satisfaction'] == 'neutral or dissatisfied', 'satisfaction'] = 0
+    df['satisfaction'] = df['satisfaction'].astype(int)
+    df.dropna(inplace=True)
+    X = df.drop(columns = ['satisfaction'])
+    y = df['satisfaction'].values
     if selected_encoder == 'OneHotEncoder':
         st.session_state.ct = OneHotEncoder() 
         X = pd.get_dummies(X)
