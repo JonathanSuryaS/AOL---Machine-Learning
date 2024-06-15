@@ -1296,15 +1296,6 @@ def training(selected_model, test_size, selected_scaler, selected_encoder):
         
         
 def ChooseModel():
-    if st.session_state.Data == []:
-        st.markdown("""
-        <br><h1 style='text-align: left; color: black; font-family: Arial;'>Model for Classification</h1>
-        """, unsafe_allow_html=True)
-        set_background('ff0f0f')
-        st.subheader('No Data to be evaluated')
-        st.subheader('Please submit data to begin analysis')
-        return
-
     if st.session_state.Model == None:
         set_background('FAF2D3')
         st.markdown("""
