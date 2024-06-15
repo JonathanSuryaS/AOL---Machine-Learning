@@ -1300,7 +1300,8 @@ def ChooseModel():
         set_background('ff0f0f')
         st.subheader('No data has been submitted')
         st.subheader('Please insert data in Input Data page')
-        
+        return
+
     if st.session_state.Model == None:
         set_background('FAF2D3')
         st.markdown("""
