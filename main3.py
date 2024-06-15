@@ -1500,6 +1500,8 @@ def result():
             dummy = pd.get_dummies(dummy)
             columns_to_check = ['Age', 'Flight Distance', 'Departure Delay in Minutes', 'Arrival Delay in Minutes']
             scale_indices = [idx for idx, col in enumerate(dummy.columns) if col in columns_to_check]
+            dummy = dummy.drop(columns=['satisfaction'])
+            
             dummy = dummy.values
             dummy[:, scale_indices] = st.session_state.sc.transform(dummy[:, scale_indices])
             to_predict = dummy[-1]
